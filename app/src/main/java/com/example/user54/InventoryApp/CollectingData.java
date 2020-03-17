@@ -1,0 +1,3853 @@
+package com.example.user54.InventoryApp;
+
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.user54.InventoryApp.Model.ItemInfo;
+import com.example.user54.InventoryApp.Model.ItemCard;
+import com.example.user54.InventoryApp.Model.ItemInfoExp;
+import com.example.user54.InventoryApp.Model.MainSetting;
+import com.example.user54.InventoryApp.Model.Stk;
+import com.example.user54.InventoryApp.Model.TransferItemsInfo;
+import com.example.user54.InventoryApp.Model.TransferVhfSerial;
+import com.example.user54.InventoryApp.R;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+import com.nightonke.boommenu.BoomButtons.BoomButton;
+import com.nightonke.boommenu.BoomMenuButton;
+import com.nightonke.boommenu.OnBoomListener;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
+public class CollectingData extends AppCompatActivity {
+    Button item, report, collecting, exitAll2, setting;
+    LinearLayout collectData, collectByORG, transferData, collectingByExpiry,
+            collectByReceipt;
+    TextView barCodTextTemp;
+    TextView home;
+
+    Dialog dialog;
+    boolean open = false, collDOpen = false, collExOpen = false, collReceipt = false,collTransfer=false;
+    String today;
+    InventoryDatabase InventDB;
+    EditText editText;
+
+    ArrayList<ItemInfo> itemUpdate = new ArrayList<>();
+    ArrayList<ItemInfoExp> itemUpdateExp = new ArrayList<>();
+    ArrayList<ItemInfoExp> itemUpdateExpRec = new ArrayList<>();
+    ArrayList<TransferItemsInfo> itemUpdateTransfer = new ArrayList<>();
+    boolean updateOpen = false, openSearch = false, openSave = false, openBarCode = false;
+    int textId = 0;
+    ArrayList<ItemCard> itemCardsList = new ArrayList<ItemCard>();
+
+    Animation animFadein;
+    TableRow row;
+    TableLayout noteTable;
+    ArrayList<ItemCard> itemCodeCard;
+    DecimalFormat numberFormat = new DecimalFormat("0.00");
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//                    setContentView(R.layout.menue3_new);
+
+        if (controll.isYellow) {
+            setContentView(R.layout.menue3_yellow);
+        } else {
+            setContentView(R.layout.menue3);
+        }
+
+
+        InventDB = new InventoryDatabase(CollectingData.this);
+
+        initialization();
+//        transferData.setEnabled(false);
+        animFadein = AnimationUtils.loadAnimation(CollectingData.this, R.anim.fade_in);
+        collectData.startAnimation(animFadein);
+        transferData.startAnimation(animFadein);
+
+
+        Date currentTimeAndDate = Calendar.getInstance().getTime();
+        SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        today = df.format(currentTimeAndDate);
+
+        home.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+
+    }
+
+
+    View.OnClickListener showDialogOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()) {
+                case R.id.collData:
+                    collectData.setClickable(false);
+                    collDOpen = true;
+                    showCollectDataDialog();
+                    break;
+//                case R.id.collByorg:
+//
+//                    showCollectByOrgDialog();
+//                    break;
+//                case R.id.collByExp:
+//                    collExOpen = true;
+//                    showCollectByExpDialog();
+////                    Intent collectIntent = new Intent(CollectingData.this,CollectingByExp.class);
+////                    collectIntent.putExtra("EXTRA_SESSION_ID", "0");
+////                    startActivity(collectIntent);
+//                    break;
+//                case R.id.collByRecep:
+//                    collReceipt = true;
+////                    Intent RIntent = new Intent(CollectingData.this,CollectingByExp.class);
+////                    RIntent.putExtra("EXTRA_SESSION_ID", "1");
+////                    startActivity(RIntent);
+//                    showCollectByReceiptDialog();
+//                    break;
+                case R.id.transfer:
+                    transferData.setClickable(false);
+                    collTransfer=true;
+                    showTransferDialog();
+                    break;
+
+            }
+        }
+    };
+
+    void showExportToTextDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.export_item_data_to_text);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    void showExportTransferItemDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.export_transfer_item_data);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    void showExportItemDataByExpiryDateDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.export_item_data_by_expiry);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    void showExportAlternativeCodeDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.export_alternatev_code);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    void showPrintShelfTagDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.print_shelf_tag);
+        dialog.setCanceledOnTouchOutside(true);
+
+        final int[] count1 = {1};
+        final TextView countText;
+        Button exit;
+        ImageButton upCount, downCount;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+        upCount = (ImageButton) dialog.findViewById(R.id.up);
+        downCount = (ImageButton) dialog.findViewById(R.id.down);
+        countText = (TextView) dialog.findViewById(R.id.countT);
+
+        upCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                count1[0]++;
+                countText.setText("" + count1[0]);
+            }
+        });
+        downCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Integer.parseInt(countText.getText().toString()) != 1) {
+                    count1[0]--;
+                    countText.setText("" + count1[0]);
+                } else
+                    Toast.makeText(CollectingData.this, "count down under value 1 ", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    void showNewItemDialog(final int tr) {
+        final Dialog dialogNew = new Dialog(CollectingData.this, R.style.Theme_Dialog);
+        dialogNew.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogNew.setCancelable(false);
+
+        if (controll.isYellow) {
+
+//            DisplayMetrics metrics = getResources().getDisplayMetrics();
+//            int screenWidth = (int) (metrics.widthPixels * 0.80);
+//            int screenH = (int) (metrics.heightPixels * 0.80);
+//            dialogNew.setContentView(R.layout.new_item_yellow);
+//
+//            getWindow().setLayout(screenWidth, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
+            dialogNew.setContentView(R.layout.new_item_yellow);
+
+        } else {
+            dialogNew.setContentView(R.layout.new_item);
+        }
+//
+
+        dialogNew.setCanceledOnTouchOutside(false);
+
+
+        final LinearLayout exit, save, clear, serach, deleteItem, deleteAllItem;
+        final EditText itemCodeNew, itemNameNew, itemPrice;
+
+        itemCodeNew = (EditText) dialogNew.findViewById(R.id.itemCNew);
+        itemNameNew = (EditText) dialogNew.findViewById(R.id.itemNameNew);
+        itemPrice = (EditText) dialogNew.findViewById(R.id.itemPrice);
+//        ArrayList<ItemCard> itemCardList = new ArrayList<>();
+
+        exit = dialogNew.findViewById(R.id.exit);
+        save = dialogNew.findViewById(R.id.saveNew);
+        clear = dialogNew.findViewById(R.id.clearNew);
+        serach = dialogNew.findViewById(R.id.searchNew);
+        deleteItem = dialogNew.findViewById(R.id.deleteItem);
+        deleteAllItem = dialogNew.findViewById(R.id.deleteAllItem);
+
+
+        itemCodeNew.requestFocus();
+
+        deleteItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!itemCodeNew.getText().toString().equals("") && !itemNameNew.getText().toString().equals("")) {
+                    alertMessageDialog(CollectingData.this.getResources().getString(R.string.delete), CollectingData.this.getResources().getString(R.string.delete_item_) +
+                            "\n \n" +CollectingData.this.getResources().getString(R.string.item_name) + itemNameNew.getText().toString() + " \n Item Code : " + itemCodeNew.getText().toString() + " \n\n from  Table ?", 2, itemNameNew.getText().toString(), itemCodeNew.getText().toString());
+
+                    itemCodeNew.setText("");
+                    itemNameNew.setText("");
+                    itemPrice.setText("");
+                    itemCodeNew.requestFocus();
+                    save.setClickable(true);
+
+                } else
+//                    Toast.makeText(CollectingData.this,CollectingData.this.getResources().getString(R.string.insertData), Toast.LENGTH_SHORT).show();
+
+                TostMesage(CollectingData.this.getResources().getString(R.string.insertData));
+
+            }
+        });
+
+        deleteAllItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertMessageDialog(CollectingData.this.getResources().getString(R.string.delete),CollectingData.this.getResources().getString(R.string.allItemDelete), 1, "", "");
+            }
+        });
+
+
+        serach.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearch = true;
+                openSave = false;
+                itemCodeNew.setText("");
+                itemNameNew.setText("");
+                itemPrice.setText("");
+                itemCodeNew.requestFocus();
+                save.setClickable(true);
+
+                SearchDialog(itemCodeNew, 3);
+            }
+        });
+
+//        itemCodeNew.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                boolean isItemFound = false;
+//
+//                String itemCode = itemCodeNew.getText().toString();
+//                String itemName = itemNameNew.getText().toString();
+//
+//
+//                if (!itemCodeNew.getText().toString().equals("") && openSave) {
+//                    itemCardsList = InventDB.getAllItemCard();
+//
+//                    for (int i = 0; i < itemCardsList.size(); i++) {
+//                        if (itemCardsList.get(i).getItemCode().equals(itemCode)) {
+//                            isItemFound = true;
+//                            itemNameNew.setText(itemCardsList.get(i).getItemName());
+//                            itemPrice.setText(itemCardsList.get(i).getSalePrc());
+//                            break;
+//
+//                        }
+//                    }
+//
+//                    if (!isItemFound) {
+//
+////                        new Handler().post(new Runnable() {
+////                            @Override
+////                            public void run() {
+////                                itemNameNew.requestFocus();
+////                            }
+////                        });
+//
+//                        save.setClickable(true);
+//                    } else {
+//                        save.setClickable(false);
+//                        showAlertDialog("This item Found please add another item ");
+//                    }
+//
+//
+//                }
+//
+//
+//            }
+//
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//            }
+//        });
+
+        itemCodeNew.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_NULL) {
+
+                    boolean isItemFound = false;
+
+                    String itemCode = itemCodeNew.getText().toString();
+                    String itemName = itemNameNew.getText().toString();
+                    String itemSwitch ;
+
+                    if (!itemCodeNew.getText().toString().equals("") && openSave) {
+                        itemCardsList = InventDB.getAllItemCard();
+
+                        itemSwitch=findSwitch(itemCode);
+                        if(!itemSwitch.equals("")){
+                            itemCode=itemSwitch;
+                        }
+
+                        for (int i = 0; i < itemCardsList.size(); i++) {
+                            if (itemCardsList.get(i).getItemCode().equals(itemCode)) {
+                                isItemFound = true;
+                                itemNameNew.setText(itemCardsList.get(i).getItemName());
+                                itemPrice.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCardsList.get(i).getFDPRC()))));
+                                break;
+
+                            }
+                        }
+
+                        if (!isItemFound) {
+
+//                        new Handler().post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                itemNameNew.requestFocus();
+//                            }
+//                        });
+
+                            save.setClickable(true);
+                        } else {
+                            save.setClickable(false);
+                            showAlertDialog("This item Found please add another item ");
+                        }
+
+
+                    }
+
+
+
+                }
+                return false;
+            }});
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!itemNameNew.getText().toString().equals("")) {
+                    ItemCard itemCard = new ItemCard();
+
+                    itemCard.setItemCode(itemCodeNew.getText().toString());
+                    itemCard.setItemName(itemNameNew.getText().toString());
+                    itemCard.setFDPRC(convertToEnglish(numberFormat.format(Double.parseDouble(itemPrice.getText().toString()))));
+
+                    InventDB.addItemcardTable(itemCard);
+                    prograseSave();
+                    itemCodeNew.setText("");
+                    itemNameNew.setText("");
+                    itemPrice.setText("");
+                    itemCodeNew.requestFocus();
+
+                } else {
+//                    Toast.makeText(CollectingData.this,CollectingData.this.getResources().getString(R.string.insertData), Toast.LENGTH_SHORT).show();
+                    TostMesage(CollectingData.this.getResources().getString(R.string.insertData));
+
+                }
+            }
+        });
+
+
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                itemCodeNew.setText("");
+                itemNameNew.setText("");
+                itemPrice.setText("");
+                itemCodeNew.requestFocus();
+                save.setClickable(true);
+            }
+        });
+
+
+//        save.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                boolean isItemFound = false;
+////                ArrayList<ItemCard> itemCardList = new ArrayList<>();
+////                String itemCode = itemCodeNew.getText().toString();
+////                String itemName = itemNameNew.getText().toString();
+////
+////                if (!itemCodeNew.getText().toString().equals("") && !itemNameNew.getText().toString().equals("") && openSave) {
+////
+////                    itemCardList = InventDB.getAllItemCard();
+////
+////                    for (int i = 0; i < itemCardList.size(); i++) {
+////                        if (itemCardList.get(i).getItemCode().equals(itemCode)) {
+////
+////                            isItemFound = true;
+////                            break;
+////
+////                        }
+////                    }
+////
+////                    if (!isItemFound) {
+//
+//                        ItemCard itemCard = new ItemCard();
+//
+//                        itemCard.setItemCode(itemCode);
+//                        itemCard.setItemName(itemName);
+//
+//                        InventDB.addItemcardTable(itemCard);
+//                        progressDialog();
+////                    itemCodes.requestFocus();
+////                    itemCodes.setText("");
+//
+//
+////                    } else {
+////                        showAlertDialog("This item Found please add another item ");
+////                    }
+////
+////
+////                } else {
+////                    Toast.makeText(CollectingData.this, "Please insert all data", Toast.LENGTH_SHORT).show();
+////                }
+//                itemCodeNew.requestFocus();
+//                itemCodeNew.setText("");
+//                itemNameNew.setText("");
+//            }
+//        });
+
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSave = false;
+                switch (tr) {
+                    case 0:
+                        break;
+                    case 1:
+                        collDOpen = true;
+                        editText.requestFocus();
+                        editText.setText("");
+                        itemCardsList = InventDB.getAllItemCard();
+                        break;
+                    case 2:
+                        collExOpen = true;
+                        editText.requestFocus();
+                        editText.setText("");
+                        itemCardsList = InventDB.getAllItemCard();
+                        break;
+                    case 3:
+                        collReceipt = true;
+                        editText.requestFocus();
+                        editText.setText("");
+                        itemCardsList = InventDB.getAllItemCard();
+                        break;
+
+                    case 4:
+                        collTransfer = true;
+                        editText.requestFocus();
+                        editText.setText("");
+                        itemCardsList = InventDB.getAllItemCard();
+                        break;
+                }
+
+                dialogNew.dismiss();
+            }
+        });
+
+        dialogNew.show();
+    }
+
+
+
+    void showImportFromTextDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.import_iteams_from_text_file);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    void showPrintBarcodeDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.print_item_barcode);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    void showChangePasswordDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.change_password);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    void showPrintSettingDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.activity_collecting_data);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    void showSendToServerDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.activity_collecting_data);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    void showReceiveFromServerDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.activity_collecting_data);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    void showCollectDataDialog() {
+        dialog = new Dialog(CollectingData.this, R.style.Theme_Dialog);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+
+        if (controll.isYellow) {
+            dialog.setContentView(R.layout.activity_collecting_data_yellow);
+//            getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+        } else {
+            dialog.setContentView(R.layout.activity_collecting_data);
+//        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+        }
+
+//
+
+        dialog.setCanceledOnTouchOutside(false);
+
+
+        final int[] count = {0};
+        final ArrayList<ItemInfo> itemPreviousScan = new ArrayList<>();
+        ArrayList<ItemInfo> itemLastScan = new ArrayList<>();
+        final String[] oldQty = {"0"};
+
+        itemLastScan = InventDB.getAllItemInfo();
+        List<MainSetting> mainSettings=InventDB.getAllMainSetting();
+
+        final boolean[] noEnterData = {true};
+
+        final boolean[] upDateClick = {false};
+        final boolean[] ExpClick = {false};
+        final Boolean[] isFound = {false};
+        final boolean[] isEnter = {true};
+
+        final CheckBox upDateCheck = (CheckBox) dialog.findViewById(R.id.updateQ);
+
+        final CheckBox ExpDateCheckBox = (CheckBox) dialog.findViewById(R.id.ExpDateCheckBox);
+        final TextView itemName, itemLocation, itemNameBefore, itemCodeBefore, itemLQtyBefore, itemAQtyBefore, itemDate, salePrice;
+        final LinearLayout exit, save, clear, update, newButton, search;
+        final Button barcode;
+        final EditText itemCodeText, itemQty;
+
+        ExpDateCheckBox.setVisibility(View.GONE);
+        itemCodeText = (EditText) dialog.findViewById(R.id.itemCode);
+        itemQty = (EditText) dialog.findViewById(R.id.item_qty);
+        itemLocation =  dialog.findViewById(R.id.location);
+
+        salePrice = (TextView) dialog.findViewById(R.id.salePrice);
+        itemName = (TextView) dialog.findViewById(R.id.item_name);
+        itemNameBefore = (TextView) dialog.findViewById(R.id.itemNameB);
+        itemCodeBefore = (TextView) dialog.findViewById(R.id.itemCodeB);
+        itemLQtyBefore = (TextView) dialog.findViewById(R.id.itemLQtyB);
+        itemAQtyBefore = (TextView) dialog.findViewById(R.id.itemAQtyB);
+        itemDate = (TextView) dialog.findViewById(R.id.DateItem);
+
+        if (!itemLastScan.isEmpty()) {
+            int qtyItem = itemLastScan.size();
+            itemNameBefore.setText(itemLastScan.get(qtyItem - 1).getItemName());
+            itemLQtyBefore.setText("" + itemLastScan.get(qtyItem - 1).getItemQty());
+            itemCodeBefore.setText(itemLastScan.get(qtyItem - 1).getItemCode());
+            itemAQtyBefore.setText(InventDB.getTotal(itemLastScan.get(qtyItem - 1).getItemCode(), "ITEMS_INFO"));
+
+        }
+
+        exit = dialog.findViewById(R.id.exit);
+        save = dialog.findViewById(R.id.save);
+        clear = dialog.findViewById(R.id.cler);
+        update = dialog.findViewById(R.id.updateBu);
+        newButton = dialog.findViewById(R.id.newBu);
+        search = dialog.findViewById(R.id.search);
+        barcode = dialog.findViewById(R.id.barcode);
+        itemDate.setText(convertToEnglish(today));
+        String StkName="";
+        if(mainSettings.size()!=0){
+            StkName= InventDB.getStkName(mainSettings.get(0).getStorNo());
+
+        }
+
+
+        itemDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimeDialog(itemDate);
+            }
+        });
+
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBarCode = true;
+                collDOpen = false;
+                readBarCode(itemCodeText, 0);
+
+            }
+        });
+
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearch = true;
+                collDOpen = false;
+                SearchDialog(itemCodeText, 0);
+            }
+        });
+
+
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collDOpen = false;
+                itemUpdate = InventDB.getAllItemInfo();
+                updateOpen = true;
+                upDateDialog(itemCodeBefore, 0, itemCodeText, itemAQtyBefore);
+
+            }
+        });
+
+        itemCodeText.requestFocus();
+        itemQty.setEnabled(true);
+        itemCodeText.setEnabled(true);
+
+        save.setClickable(true);
+        itemCodeText.setText("");
+        itemQty.setText("1");
+        itemName.setText("");
+        itemLocation.setText(StkName);
+        salePrice.setText("");
+
+        final int[] serialInfo = {InventDB.getAllItemInfo().size()};
+
+        clear.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                itemCodeText.requestFocus();
+                itemQty.setEnabled(true);
+                itemCodeText.setEnabled(true);
+
+                save.setClickable(true);
+                itemCodeText.setText("");
+                itemQty.setText("1");
+                itemName.setText("");
+//                itemLocation.setText("");
+                salePrice.setText("");
+//                if (!itemPreviousScan.isEmpty()) {
+//                    itemNameBefore.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+//                    itemCodeBefore.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+//                    itemLQtyBefore.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+////                    float AllQty = Float.parseFloat(itemPreviousScan.get(count[0] - 1).getItemLocation()) + itemPreviousScan.get(count[0] - 1).getItemQty();
+////                    itemAQtyBefore.setText("" + AllQty);
+//
+//                }
+            }
+        });
+
+//        ArrayList<ItemCard> itemCardsList = new ArrayList<ItemCard>();
+
+        itemCardsList = InventDB.getAllItemCard();
+//        itemCodeText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (!hasFocus){
+//                    // TODO: the editText has just been left
+//                    if(!isFound[0]){
+//                        showAlertDialog("This item not found please add this item before ");
+//                        new Handler().post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                itemCodeText.requestFocus();
+//                            }
+//                        });
+//
+//                        itemQty.setEnabled(true);
+//                        itemCodeText.setEnabled(true);
+//
+//                        save.setClickable(true);
+//                        itemCodeText.setText("");
+//                        itemQty.setText("1");
+//                        itemName.setText("");
+//                        salePrice.setText("");
+//                        itemLocation.setText("");
+//                    }
+//                }
+//
+//            }
+//        });
+
+/*from
+//        itemQty.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+//            @Override
+//            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+//                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_SEARCH
+//                        || actionId == EditorInfo.IME_NULL) {
+//
+//                    if(ExpClick[0]){
+//                        TimeDialog(itemDate);
+//                    }
+//                }
+//            return false;
+//            }});
+*///to
+
+//
+        itemCodeText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_NULL) {
+//                    if (isEnter[0]) {
+//                        if (!isFound[0]) {
+//                            showAlertDialog("This item not found please add this item before ");
+//                            new Handler().post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    itemCodeText.requestFocus();
+//                                }
+//                            });
+//
+//                            itemQty.setEnabled(true);
+//                            itemCodeText.setEnabled(true);
+//
+//                            save.setClickable(true);
+//                            itemCodeText.setText("");
+//                            itemQty.setText("1");
+//                            itemName.setText("");
+//                            salePrice.setText("");
+//                            itemLocation.setText("");
+//                            isEnter[0] = false;
+//                        }
+//
+//                    }
+
+
+                    String itemCode = itemCodeText.getText().toString();
+                    String itemSwitch = "";
+
+                    if (!itemCode.equals("") && collDOpen && noEnterData[0]) {
+                        isEnter[0] = true;
+
+                        Log.e("itemCardsList.size()", "-->" + itemCardsList.size());
+
+                        itemSwitch=findSwitch(itemCode);
+                        if(!itemSwitch.equals("")){
+                            itemCode=itemSwitch;
+                        }
+
+                            for (int i = 0; i < itemCardsList.size(); i++) {
+                                String itemCodeList = itemCardsList.get(i).getItemCode();
+                                if (itemCode.equals(itemCodeList)) {
+                                    isFound[0] = true;
+
+                                    itemName.setText(itemCardsList.get(i).getItemName());
+                                    salePrice.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCardsList.get(i).getFDPRC()))));
+
+
+                                    break;
+                                } else {
+                                    isFound[0] = false;
+                                }
+                            }
+
+
+                        if (isFound[0]) {
+
+
+                            if (upDateClick[0] || ExpClick[0]) {
+                                save.setClickable(true);
+                                itemCodeText.setEnabled(false);
+                                itemQty.setEnabled(true);
+
+
+//                                itemQty.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//                                    @Override
+//                                    public void onFocusChange(View v, boolean hasFocus) {
+//                                        if (!hasFocus){
+//                                            // TODO: the editText has just been left
+//                                            if(ExpClick[0]){
+//                                                TimeDialog(itemDate);
+//                                            }
+//                                        }
+//
+//                                    }
+//                                });
+
+
+                                if (event != null) {
+                                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER || event.getKeyCode() == KeyEvent.ACTION_DOWN) {
+
+                                                itemLocation.requestFocus();
+
+                                    } else {
+                                        itemQty.requestFocus();
+                                    }
+                                } else {
+                                    new Handler().post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            itemQty.requestFocus();
+                                        }
+                                    });
+
+                                }
+
+
+//                            Toast.makeText(CollectingData.this, "save no auto", Toast.LENGTH_SHORT).show();
+                            } else {
+//                            Toast.makeText(CollectingData.this, "save auto", Toast.LENGTH_SHORT).show();
+                                oldQty[0] = InventDB.getTotal(itemCode, "ITEMS_INFO");
+                                itemQty.setText("1");
+                                save.setClickable(false);
+                                itemCodeText.setEnabled(false);
+                                itemQty.setEnabled(false);
+
+                                ItemInfo item = new ItemInfo();
+
+                                String Lo="";
+
+                               List<MainSetting>mainSettings=InventDB.getAllMainSetting();
+                               if(mainSettings.size()!=0){
+                                   Lo=mainSettings.get(0).getStorNo();
+                               }
+
+                                item.setItemCode(itemCode);
+                                item.setItemName(itemName.getText().toString());
+                                item.setItemQty(Float.parseFloat(itemQty.getText().toString()));
+                                item.setItemLocation(Lo);
+                                item.setRowIndex(Float.parseFloat("0.0"));
+                                item.setSerialNo(serialInfo[0]++);
+                                item.setExpDate(itemDate.getText().toString());
+                                item.setIsExport("0");
+//                                if (ExpClick[0]) {
+//                                    item.setExpDate(itemDate.getText().toString());
+//                                } else {
+//                                    item.setExpDate(today);
+//                                }
+                                if (!salePrice.getText().toString().equals("")) {
+                                    item.setSalePrice(Float.parseFloat(convertToEnglish(numberFormat.format(Double.parseDouble(salePrice.getText().toString())))));
+                                } else {
+                                    item.setSalePrice(0);
+                                }
+                                item.setTrnDate(convertToEnglish(today));
+
+                                InventDB.addItemcard(item);
+
+                                item.setItemLocation(oldQty[0]);
+                                Log.e("ol12", "===>" + oldQty[0]);
+                                itemPreviousScan.add(item);
+//                            Toast.makeText(CollectingData.this, "Saved Successfully ", Toast.LENGTH_SHORT).show();
+                                count[0]++;
+
+                                progressDialog();
+
+////////////////////////////////CLEAR ////////
+
+
+                                new Handler().post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        itemCodeText.requestFocus();
+                                    }
+                                });
+
+
+                                itemQty.setEnabled(true);
+                                itemCodeText.setEnabled(true);
+
+                                save.setClickable(true);
+                                itemCodeText.setText("");
+                                itemQty.setText("1");
+                                salePrice.setText("");
+                                itemName.setText("");
+//                                itemLocation.setText("");
+
+                                if (!itemPreviousScan.isEmpty()) {
+                                    itemNameBefore.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+                                    itemCodeBefore.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+                                    itemLQtyBefore.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+
+                                    float AllQty = Float.parseFloat(itemPreviousScan.get(count[0] - 1).getItemLocation()) + itemPreviousScan.get(count[0] - 1).getItemQty();
+                                    itemAQtyBefore.setText("" + AllQty);
+
+
+                                }
+
+
+                            }
+
+
+                        } else {
+
+
+                            showAlertDialog(CollectingData.this.getResources().getString(R.string.itemNotFoundAlert));
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    itemCodeText.requestFocus();
+                                }
+                            });
+
+                            itemQty.setEnabled(true);
+                            itemCodeText.setEnabled(true);
+
+                            save.setClickable(true);
+                            itemCodeText.setText("");
+                            itemQty.setText("1");
+                            itemName.setText("");
+                            salePrice.setText("");
+//                            itemLocation.setText("");
+                            isEnter[0] = false;
+
+
+//                        showAlertDialog("This item not found please add this item before ");
+//                        Toast.makeText(CollectingData.this, "This item not found please add this item before ", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+
+
+                }
+
+
+                return false;
+            }
+        });
+
+
+//        itemCodeText.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count1) {
+//
+//                String itemCode = itemCodeText.getText().toString();
+//                if (!itemCode.equals("") && collDOpen && noEnterData[0]) {
+//                    isEnter[0]=true;
+//                    Log.e("itemCardsList.size()", "-->" + itemCardsList.size());
+//                    for (int i = 0; i < itemCardsList.size(); i++) {
+//                        String itemCodeList = itemCardsList.get(i).getItemCode();
+//                        if (itemCode.equals(itemCodeList)) {
+//                            isFound[0] = true;
+//
+//                            itemName.setText(itemCardsList.get(i).getItemName());
+//                            salePrice.setText(itemCardsList.get(i).getSalePrc());
+//
+//
+//                            break;
+//                        } else {
+//                            isFound[0] = false;
+//                        }
+//                    }
+//
+//                    if (isFound[0]) {
+//
+//
+//                        if (upDateClick[0]|| ExpClick[0]) {
+//                            save.setClickable(true);
+//                            itemCodeText.setEnabled(false);
+//                            itemQty.setEnabled(true);
+//
+//                            itemQty.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//                                @Override
+//                                public void onFocusChange(View v, boolean hasFocus) {
+//                                    if (!hasFocus){
+//                                    // TODO: the editText has just been left
+//                                        if(ExpClick[0]){
+//                                            TimeDialog(itemDate);
+//                                        }
+//                                }
+//
+//                                }
+//                            });
+//
+//                            new Handler().post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    itemQty.requestFocus();
+//                                }
+//                            });
+//
+////                            Toast.makeText(CollectingData.this, "save no auto", Toast.LENGTH_SHORT).show();
+//                        } else {
+////                            Toast.makeText(CollectingData.this, "save auto", Toast.LENGTH_SHORT).show();
+//                            oldQty[0] = InventDB.getTotal(itemCode, "ITEMS_INFO");
+//                            itemQty.setText("1");
+//                            save.setClickable(false);
+//                            itemCodeText.setEnabled(false);
+//                            itemQty.setEnabled(false);
+//                            ItemInfo item = new ItemInfo();
+//
+//                            item.setItemCode(itemCodeText.getText().toString());
+//                            item.setItemName(itemName.getText().toString());
+//                            item.setItemQty(Float.parseFloat(itemQty.getText().toString()));
+//                            item.setItemLocation("12");
+//                            item.setRowIndex(Float.parseFloat("0.0"));
+//                            item.setSerialNo(serialInfo[0]++);
+//                            if(ExpClick[0]) {
+//                                item.setExpDate(itemDate.getText().toString());
+//                            }else{
+//                                item.setExpDate("noExp");
+//                            }
+//                            if(!salePrice.getText().toString().equals("")){
+//                                item.setSalePrice(Float.parseFloat(salePrice.getText().toString()));
+//                            }else{
+//                                item.setSalePrice(0);
+//                            }
+//
+//
+//                            InventDB.addItemcard(item);
+//
+//                            item.setItemLocation(oldQty[0]);
+//                            Log.e("ol12", "===>" + oldQty[0]);
+//                            itemPreviousScan.add(item);
+////                            Toast.makeText(CollectingData.this, "Saved Successfully ", Toast.LENGTH_SHORT).show();
+//                            count[0]++;
+//
+//                            progressDialog();
+//
+//////////////////////////////////CLEAR ////////
+//
+//                            itemCodeText.requestFocus();
+//                            itemQty.setEnabled(true);
+//                            itemCodeText.setEnabled(true);
+//
+//                            save.setClickable(true);
+//                            itemCodeText.setText("");
+//                            itemQty.setText("1");
+//                            salePrice.setText("");
+//                            itemName.setText("");
+//                            itemLocation.setText("");
+//
+//                            if (!itemPreviousScan.isEmpty()) {
+//                                itemNameBefore.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+//                                itemCodeBefore.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+//                                itemLQtyBefore.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+//
+//                                float AllQty = Float.parseFloat(itemPreviousScan.get(count[0] - 1).getItemLocation()) + itemPreviousScan.get(count[0] - 1).getItemQty();
+//                                itemAQtyBefore.setText("" + AllQty);
+//
+//
+//                            }
+//
+//
+//                        }
+//
+//
+//                    } else {
+//
+////                        showAlertDialog("This item not found please add this item before ");
+////                        Toast.makeText(CollectingData.this, "This item not found please add this item before ", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                }
+//            }
+//
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+////                itemQty.setText("1");
+//            }
+//
+//        });
+
+
+        newButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collDOpen = false;
+                editText = itemCodeText;
+                openSave = true;
+
+                showNewItemDialog(1);
+            }
+        });
+
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String itemSwitch="";
+                String itemCode=itemCodeText.getText().toString();
+                itemSwitch=findSwitch(itemCode);
+                if(!itemSwitch.equals("")){
+                    itemCode=itemSwitch;
+                }
+
+                oldQty[0] = InventDB.getTotal(itemCode, "ITEMS_INFO");
+
+                if (!itemQty.getText().toString().equals("")&& !itemCode.equals("") && !salePrice.getText().toString().equals("") && isFound[0]) {
+
+                    ItemInfo item = new ItemInfo();
+
+                    String Lo="";
+                    item.setItemCode(itemCode);
+                    item.setItemName(itemName.getText().toString());
+                    item.setItemQty(Float.parseFloat(itemQty.getText().toString()));
+
+                    List<MainSetting>mainSettings=InventDB.getAllMainSetting();
+                    if(mainSettings.size()!=0){
+                        Lo=mainSettings.get(0).getStorNo();
+                    }
+                    item.setItemLocation(Lo);
+                    item.setRowIndex(Float.parseFloat("0.0"));
+                    item.setSerialNo(serialInfo[0]++);
+                    item.setExpDate(itemDate.getText().toString());
+//                    if (ExpClick[0]) {
+//                        item.setExpDate(itemDate.getText().toString());
+//                    } else {
+//                        item.setExpDate(today);
+//                    }
+                    item.setSalePrice(Float.parseFloat(convertToEnglish(numberFormat.format(Double.parseDouble(salePrice.getText().toString())))));
+                    item.setTrnDate(convertToEnglish(today));
+                    item.setIsExport("0");
+                    InventDB.addItemcard(item);
+                    item.setItemLocation(oldQty[0]);
+                    itemPreviousScan.add(item);
+                    count[0]++;
+
+                    progressDialog();
+                    ////////CLEAR ///
+
+                    itemCodeText.requestFocus();
+                    itemQty.setEnabled(true);
+                    itemCodeText.setEnabled(true);
+
+                    save.setClickable(true);
+                    itemCodeText.setText("");
+                    itemQty.setText("1");
+                    itemName.setText("");
+                    salePrice.setText("");
+//                    itemLocation.setText("");
+
+                    if (!itemPreviousScan.isEmpty()) {
+                        itemNameBefore.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+                        itemCodeBefore.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+                        itemLQtyBefore.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+                        float AllQty = Float.parseFloat(itemPreviousScan.get(count[0] - 1).getItemLocation()) + itemPreviousScan.get(count[0] - 1).getItemQty();
+                        itemAQtyBefore.setText("" + AllQty);
+
+
+                    }
+
+                } else {
+//                    Toast.makeText(CollectingData.this, "please insert all data in field", Toast.LENGTH_SHORT).show();
+                    TostMesage(CollectingData.this.getResources().getString(R.string.insertData));
+
+                }
+
+            }
+        });
+
+        upDateCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (upDateCheck.isChecked()) {
+                    upDateClick[0] = true;
+                } else {
+                    upDateClick[0] = false;
+                }
+            }
+        });
+
+        ExpDateCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ExpDateCheckBox.isChecked()) {
+                    ExpClick[0] = true;
+                } else {
+                    ExpClick[0] = false;
+                }
+            }
+        });
+
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collectData.setClickable(true);
+                collDOpen = false;
+                noEnterData[0] = false;
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+
+//   void Clear(EditText itemCodeText,EditText itemQty ,EditText itemName ,TextView itemNameBefore ,TextView itemCodeBefore
+//   ,TextView itemLQtyBefore){
+//
+//       itemCodeText.requestFocus();
+//       itemQty.setEnabled(true);
+//       itemCodeText.setEnabled(true);
+//
+//       save.setClickable(true);
+//       itemCodeText.setText("");
+//       itemQty.setText("1");
+//       itemName.setText("");
+//       itemLocation.setText("");
+//
+//       if (!itemPreviousScan.isEmpty()) {
+//           itemNameBefore.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+//           itemCodeBefore.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+//           itemLQtyBefore.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+//           float AllQty = Float.parseFloat(itemPreviousScan.get(count[0] - 1).getItemLocation()) + itemPreviousScan.get(count[0] - 1).getItemQty();
+//           itemAQtyBefore.setText("" + AllQty);
+//
+//       }
+//
+//
+//   }
+
+
+    void showCollectByOrgDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.activity_collecting_data);
+        dialog.setCanceledOnTouchOutside(false);
+
+        Button exit;
+
+        exit = (Button) dialog.findViewById(R.id.exit);
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+    }
+
+    void showCollectByExpDialog() {
+        final Dialog dialog1 = new Dialog(CollectingData.this);
+        dialog1.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog1.setCancelable(false);
+        dialog1.setContentView(R.layout.collecting_data_by_expiry_data);
+        dialog1.setCanceledOnTouchOutside(false);
+
+//        Toast.makeText(this, "1234567", Toast.LENGTH_SHORT).show();
+        final boolean[] noEnter = {true};
+        final Boolean[] isFoundExp = {false};
+        final int[] count = {0};
+
+
+        final String[] oldQty = {"0"};
+        /////
+        final Button exit, save, clear, update, newButton, search, barcode;
+        final CheckBox upDateQty = (CheckBox) dialog1.findViewById(R.id.upDateQyt);//batch
+        final CheckBox BatchNo = (CheckBox) dialog1.findViewById(R.id.batch);
+        ArrayList<ItemInfoExp> itemLastScan = new ArrayList<>();
+//        ArrayList<ItemCard> itemCardsList = new ArrayList<ItemCard>();
+        final EditText batchText, itemCodeText1, itemQty;
+        final TextView itemName, itemAvl, itemCodeP, itemSaleP, itemCodeBefor, itemNameBefor,
+                itemAlBe, itemLastBe, itemDate;
+
+
+        exit = (Button) dialog1.findViewById(R.id.exit);
+        save = (Button) dialog1.findViewById(R.id.saveExp);
+        clear = (Button) dialog1.findViewById(R.id.clearExp);
+        update = (Button) dialog1.findViewById(R.id.updateExp);
+        newButton = (Button) dialog1.findViewById(R.id.newBuEx);
+        search = (Button) dialog1.findViewById(R.id.searchExp);
+
+        itemCodeText1 = (EditText) dialog1.findViewById(R.id.items1);
+        itemQty = (EditText) dialog1.findViewById(R.id.item_Qty);
+        batchText = (EditText) dialog1.findViewById(R.id.batchText);
+
+        itemName = (TextView) dialog1.findViewById(R.id.itemNames);
+        itemAvl = (TextView) dialog1.findViewById(R.id.Avl);
+        itemCodeP = (TextView) dialog1.findViewById(R.id.costP);
+        itemSaleP = (TextView) dialog1.findViewById(R.id.saleP);
+        itemCodeBefor = (TextView) dialog1.findViewById(R.id.itemCodeBef);
+        itemNameBefor = (TextView) dialog1.findViewById(R.id.itemNameBef);
+        itemAlBe = (TextView) dialog1.findViewById(R.id.itemAllBef);
+        itemLastBe = (TextView) dialog1.findViewById(R.id.itemLQtyBef);
+        itemDate = (TextView) dialog1.findViewById(R.id.DateItem);
+        barcode = (Button) dialog1.findViewById(R.id.barcode);
+
+
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBarCode = true;
+                collExOpen = false;
+                readBarCode(itemCodeText1, 1);
+
+            }
+        });
+        newButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collExOpen = false;
+                editText = itemCodeText1;
+                openSave = true;
+                showNewItemDialog(2);
+            }
+        });
+
+        itemLastScan = InventDB.getAllItemInfoExp();
+        final int[] serialExp = {itemLastScan.size()};
+
+        itemCardsList = InventDB.getAllItemCard();
+
+
+        itemCodeText1.setEnabled(true);
+        itemCodeText1.requestFocus();
+        itemQty.setEnabled(true);
+
+
+        save.setClickable(true);
+        itemCodeText1.setText("");
+        itemQty.setText("1");
+        itemName.setText("");
+        itemDate.setText(convertToEnglish(today));
+
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearch = true;
+                collExOpen = false;
+                SearchDialog(itemCodeText1, 1);
+            }
+        });
+
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collExOpen = false;
+                itemUpdateExp = InventDB.getAllItemInfoExp();
+                updateOpen = true;
+                upDateDialog(itemCodeBefor, 1, itemCodeText1, itemAlBe);
+
+            }
+        });
+
+
+        itemDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimeDialog(itemDate);
+            }
+        });
+
+        if (!itemLastScan.isEmpty()) {
+            int qtyItem = itemLastScan.size();
+            itemNameBefor.setText(itemLastScan.get(qtyItem - 1).getItemName());
+            itemLastBe.setText("" + itemLastScan.get(qtyItem - 1).getItemQty());
+            itemCodeBefor.setText(itemLastScan.get(qtyItem - 1).getItemCode());
+            itemAlBe.setText(InventDB.getTotal(itemLastScan.get(qtyItem - 1).getItemCode(), "ITEM_INFO_EXP"));
+        }
+
+//        final ArrayList<ItemCard> itemCardsList = itemCardsList;
+        final ArrayList<ItemInfoExp> itemPreviousScan = new ArrayList<>();
+
+        clear.setOnClickListener(new View.OnClickListener() {
+
+            public void onClick(View v) {
+
+                itemCodeText1.requestFocus();
+                itemQty.setEnabled(true);
+                itemCodeText1.setEnabled(true);
+
+                save.setClickable(true);
+                itemCodeText1.setText("");
+                itemQty.setText("1");
+                itemName.setText("");
+                batchText.setText("");
+
+//                if (!itemPreviousScan.isEmpty()) {
+//                    itemNameBefor.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+//                    itemCodeBefor.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+//                    itemLastBe.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+//                    float AllQty = itemPreviousScan.get(count[0] - 1).getRowIndex() + itemPreviousScan.get(count[0] - 1).getItemQty();
+//                    itemAlBe.setText("" + AllQty);
+//
+//                }
+            }
+        });
+
+        itemCodeText1.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count2) {
+                String itemCode = itemCodeText1.getText().toString();
+                if (!itemCode.equals("") && collExOpen && noEnter[0]) {
+
+                    for (int i = 0; i < itemCardsList.size(); i++) {
+                        String itemCodeList = itemCardsList.get(i).getItemCode();
+                        if (itemCode.equals(itemCodeList)) {
+                            itemName.setText(itemCardsList.get(i).getItemName());
+                            itemAvl.setText(itemCardsList.get(i).getAVLQty());
+                            itemCodeP.setText(itemCardsList.get(i).getCostPrc());
+                            itemSaleP.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCardsList.get(i).getFDPRC()))));
+
+                            isFoundExp[0] = true;
+                            break;
+                        } else {
+                            isFoundExp[0] = false;
+                        }
+                    }
+
+                    if (isFoundExp[0]) {
+
+                        if (upDateQty.isChecked()) {
+                            save.setClickable(true);
+                            itemCodeText1.setEnabled(false);
+                            itemQty.setEnabled(true);
+
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    itemQty.requestFocus();
+                                }
+                            });
+
+//                            Toast.makeText(CollectingData.this, "save no auto", Toast.LENGTH_SHORT).show();
+                        } else {
+//                            Toast.makeText(CollectingData.this, "save auto", Toast.LENGTH_SHORT).show();
+                            oldQty[0] = InventDB.getTotal(itemCode, "ITEM_INFO_EXP");
+                            itemQty.setText("1");
+                            save.setClickable(false);
+                            itemCodeText1.setEnabled(false);
+                            itemQty.setEnabled(false);
+
+                            if (BatchNo.isChecked()) {
+                                if (!batchText.getText().toString().equals("")) {
+
+                                    count[0]++;
+
+                                    saveFunction(itemCodeText1, itemName, itemQty, itemDate, 1, "--",
+                                            batchText.getText().toString(), itemAvl, itemNameBefor, itemLastBe, itemAlBe,
+                                            itemCodeP, itemSaleP, itemPreviousScan, count[0], save, itemCodeBefor, oldQty[0], serialExp[0]++);
+
+//                            if (!batchText.getText().toString().equals("")) {
+//
+//                                ItemInfoExp item = new ItemInfoExp();
+//
+//                                item.setItemCode(itemCodeText1.getText().toString());
+//                                item.setItemName(itemName.getText().toString());
+//                                item.setItemQty(Float.parseFloat(itemQty.getText().toString()));
+//                                item.setExpDate(itemDate.getText().toString());
+//                                item.setBatchNo(batchText.getText().toString());
+//                                item.setRowIndex(Float.parseFloat("0.0"));
+//                                item.setAVLQTY(itemAvl.getText().toString());
+//                                item.setCostPrc(itemCodeP.getText().toString());
+//                                item.setSalePrc(itemSaleP.getText().toString());
+//                                item.setReceiptNo("");
+//
+//                                InventDB.addItemInfoExp(item);
+//
+//                                item.setRowIndex(Float.parseFloat(oldQty[0]));
+//                                itemPreviousScan.add(item);
+////                            Toast.makeText(CollectingData.this, "Saved Successfully ", Toast.LENGTH_SHORT).show();
+//                                count[0]++;
+//
+//                                progressDialog();
+//
+//////////////////////////////////CLEAR ////////
+//
+//                                itemCodeText1.requestFocus();
+//                                itemQty.setEnabled(true);
+//                                itemCodeText1.setEnabled(true);
+//
+//                                save.setClickable(true);
+//                                itemCodeText1.setText("");
+//                                itemQty.setText("1");
+//                                itemName.setText("");
+//                                itemAvl.setText("");
+//                                itemCodeP.setText("");
+//                                itemSaleP.setText("");
+//                                batchText.setText("");
+//
+//                                if (!itemPreviousScan.isEmpty()) {
+//                                    itemNameBefor.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+//                                    itemCodeBefor.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+//                                    itemLastBe.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+//
+//                                    float AllQty = itemPreviousScan.get(count[0] - 1).getRowIndex() + itemPreviousScan.get(count[0] - 1).getItemQty();
+//                                    itemAlBe.setText("" + AllQty);
+//
+//
+//                                }
+
+                                } else {
+                                    showAlertDialog("Batch Filed Empty Please Enter data");
+
+                                    new Handler().post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            batchText.requestFocus();
+                                        }
+                                    });
+                                    save.setClickable(true);
+                                }
+                            } else {
+                                count[0]++;
+                                saveFunction(itemCodeText1, itemName, itemQty, itemDate, 1, "--",
+                                        "--", itemAvl, itemNameBefor, itemLastBe, itemAlBe,
+                                        itemCodeP, itemSaleP, itemPreviousScan, count[0], save, itemCodeBefor, oldQty[0], serialExp[0]++);
+                            }
+
+
+                        }
+
+
+                    } else {
+                        showAlertDialog("This item not found please add this item before ");
+//                        Toast.makeText(CollectingData.this, "This item not found please add this item before ", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                oldQty[0] = InventDB.getTotal(itemCodeText1.getText().toString(), "ITEM_INFO_EXP");
+
+                if (!itemQty.getText().toString().equals("") && !itemCodeText1.getText().toString().equals("") && isFoundExp[0]) {
+                    if (BatchNo.isChecked()) {
+                        if (!batchText.getText().toString().equals("")) {
+                            count[0]++;
+                            saveFunction(itemCodeText1, itemName, itemQty, itemDate, 1, "--",
+                                    batchText.getText().toString(), itemAvl, itemNameBefor, itemLastBe, itemAlBe,
+                                    itemCodeP, itemSaleP, itemPreviousScan, count[0], save, itemCodeBefor, oldQty[0], serialExp[0]++);
+
+//                        ItemInfoExp item = new ItemInfoExp();
+//
+//                        item.setItemCode(itemCodeText1.getText().toString());
+//                        item.setItemName(itemName.getText().toString());
+//                        item.setItemQty(Float.parseFloat(itemQty.getText().toString()));
+//                        item.setExpDate(itemDate.getText().toString());
+//                        item.setBatchNo(batchText.getText().toString());
+//                        item.setRowIndex(Float.parseFloat("0.0"));
+//                        item.setAVLQTY(itemAvl.getText().toString());
+//                        item.setCostPrc(itemCodeP.getText().toString());
+//                        item.setSalePrc(itemSaleP.getText().toString());
+//                        item.setReceiptNo("");
+//
+//                        InventDB.addItemInfoExp(item);
+//
+//                        item.setRowIndex(Float.parseFloat(oldQty[0]));
+//                        itemPreviousScan.add(item);
+//                        count[0]++;
+//
+//                        progressDialog();
+//                        ////////CLEAR ///
+//
+//                        itemCodeText1.requestFocus();
+//                        itemQty.setEnabled(true);
+//                        itemCodeText1.setEnabled(true);
+//
+//                        save.setClickable(true);
+//                        itemCodeText1.setText("");
+//                        itemQty.setText("1");
+//                        itemName.setText("");
+//                        itemAvl.setText("");
+//                        itemCodeP.setText("");
+//                        itemSaleP.setText("");
+//                        batchText.setText("");
+//
+//                        if (!itemPreviousScan.isEmpty()) {
+//                            itemNameBefor.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+//                            itemCodeBefor.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+//                            itemLastBe.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+//                            float AllQty = itemPreviousScan.get(count[0] - 1).getRowIndex() + itemPreviousScan.get(count[0] - 1).getItemQty();
+//                            itemAlBe.setText("" + AllQty);
+//
+//
+//                        }
+                        } else {
+                            showAlertDialog("Batch Filed Empty Please Enter data");
+
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    batchText.requestFocus();
+                                }
+                            });
+
+
+                        }
+                    } else {
+                        count[0]++;
+                        saveFunction(itemCodeText1, itemName, itemQty, itemDate, 1, "--",
+                                "--", itemAvl, itemNameBefor, itemLastBe, itemAlBe,
+                                itemCodeP, itemSaleP, itemPreviousScan, count[0], save, itemCodeBefor, oldQty[0], serialExp[0]++);
+                    }
+
+                } else {
+                    Toast.makeText(CollectingData.this, "please insert all data in field", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
+
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                noEnter[0] = false;
+                dialog1.dismiss();
+            }
+        });
+        dialog1.show();
+    }
+
+
+    void showAlertDialog(String TextMessage) {
+//        final Dialog dialogAlert = new Dialog(CollectingData.this);
+//        dialogAlert.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialogAlert.setCancelable(false);
+//        dialogAlert.setContentView(R.layout.alert_dialog_not_found);
+//        dialogAlert.setCanceledOnTouchOutside(false);
+//        TextView textMessage = (TextView) dialogAlert.findViewById(R.id.alertMessage);
+//        Button exitAlert = (Button) dialogAlert.findViewById(R.id.exitAlert);
+//        textMessage.setText(TextMessage);
+//
+//        dialogAlert.show();
+////        try {
+////            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+////            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+////            r.play();
+////
+////        } catch (Exception e) {
+////            e.printStackTrace();
+////        }
+//
+//        final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+//        tg.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT);
+//
+//        exitAlert.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialogAlert.dismiss();
+//
+//            }
+//        });
+
+
+        new SweetAlertDialog(CollectingData.this, SweetAlertDialog.ERROR_TYPE)
+                .setTitleText(getResources().getString(R.string.ops))
+                .setContentText(TextMessage)
+                .show();
+
+        final ToneGenerator tg = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+        tg.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT);
+
+
+
+//
+//        new SweetAlertDialog(CollectingData.this, SweetAlertDialog.WARNING_TYPE)
+//                .setTitleText("Are you sure?")
+//                .setContentText(TextMessage)
+//                .setConfirmText("Item!")
+//                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                    @Override
+//                    public void onClick(SweetAlertDialog sDialog) {
+//                        sDialog.dismissWithAnimation();
+//                    }
+//                })
+//                .setCancelButton("Cancel", new SweetAlertDialog.OnSweetClickListener() {
+//                    @Override
+//                    public void onClick(SweetAlertDialog sDialog) {
+//                        sDialog.dismissWithAnimation();
+//                    }
+//                })
+//                .show();
+
+
+    }
+
+
+    void showCollectByReceiptDialog() {
+        dialog = new Dialog(CollectingData.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(false);
+        dialog.setContentView(R.layout.collecting_data_with_receipt);
+        dialog.setCanceledOnTouchOutside(false);
+
+        final boolean[] noEnterR = {true};
+        final Boolean[] isFoundRec = {false};
+        final String[] oldQty = {"0"};
+        final int[] count = {0};
+
+
+        final Button exit, save, clear, update, newButton, search, barcode;
+        final TextView itemName, Avl, costPrc, salePrc, dateExp, itemNameBefore, itemCodeBefore, lastQty, allQty;
+        final EditText itemCodeTextReceipt, itemQty, batchNo, receiptNo;
+
+        itemCodeTextReceipt = (EditText) dialog.findViewById(R.id.itemCodes12);
+        itemQty = (EditText) dialog.findViewById(R.id.itemQt);
+        batchNo = (EditText) dialog.findViewById(R.id.batchRecpic);
+        receiptNo = (EditText) dialog.findViewById(R.id.receirtNo);
+
+        itemName = (TextView) dialog.findViewById(R.id.itemName);
+        Avl = (TextView) dialog.findViewById(R.id.avlQty);
+        costPrc = (TextView) dialog.findViewById(R.id.costP);
+        salePrc = (TextView) dialog.findViewById(R.id.saleP);
+        dateExp = (TextView) dialog.findViewById(R.id.dateExp);
+        itemNameBefore = (TextView) dialog.findViewById(R.id.itemNameBe);
+        itemCodeBefore = (TextView) dialog.findViewById(R.id.itemCodeBe);
+        lastQty = (TextView) dialog.findViewById(R.id.itemLastBe);
+        allQty = (TextView) dialog.findViewById(R.id.itemAllBe);
+
+
+        clear = (Button) dialog.findViewById(R.id.clear);
+        save = (Button) dialog.findViewById(R.id.save);
+        exit = (Button) dialog.findViewById(R.id.exit);
+        update = (Button) dialog.findViewById(R.id.updateRec);
+        newButton = (Button) dialog.findViewById(R.id.new1);
+        search = (Button) dialog.findViewById(R.id.searchExpRec);
+
+        barcode = (Button) dialog.findViewById(R.id.barcode);
+
+
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openBarCode = true;
+                collReceipt = false;
+                readBarCode(itemCodeTextReceipt, 2);
+
+            }
+        });
+
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearch = true;
+                collReceipt = false;
+                SearchDialog(itemCodeTextReceipt, 2);
+            }
+        });
+
+        newButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collReceipt = false;
+                editText = itemCodeTextReceipt;
+                openSave = true;
+                showNewItemDialog(3);
+            }
+        });
+
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collReceipt = false;
+                String itemCode = itemCodeBefore.getText().toString();
+
+                itemUpdateExpRec = InventDB.getAllItemInfoExpRec();
+                updateOpen = true;
+                upDateDialog(itemCodeBefore, 2, itemCodeTextReceipt, allQty);
+
+            }
+        });
+
+
+        final CheckBox upDateQty, batchCheck;
+        upDateQty = (CheckBox) dialog.findViewById(R.id.upDateRecip);
+        batchCheck = (CheckBox) dialog.findViewById(R.id.batchBox);
+
+
+        ArrayList<ItemInfoExp> itemLastScan = new ArrayList<ItemInfoExp>();
+//        ArrayList<ItemCard> itemCardsList = new ArrayList<ItemCard>();
+
+        itemLastScan = InventDB.getAllItemInfoExpRec();
+        final int[] serialRec = {itemLastScan.size()};
+
+        itemCodeTextReceipt.setEnabled(true);
+        itemCodeTextReceipt.requestFocus();
+        itemQty.setEnabled(true);
+
+
+        save.setClickable(true);
+        itemCodeTextReceipt.setText("");
+        itemQty.setText("1");
+        itemName.setText("");
+        dateExp.setText(convertToEnglish(today));
+
+        Log.e("4", "addText");
+        dateExp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TimeDialog(dateExp);
+            }
+        });
+
+        if (!itemLastScan.isEmpty()) {
+            int qtyItem = itemLastScan.size();
+            itemNameBefore.setText(itemLastScan.get(qtyItem - 1).getItemName());
+            lastQty.setText("" + itemLastScan.get(qtyItem - 1).getItemQty());
+            itemCodeBefore.setText(itemLastScan.get(qtyItem - 1).getItemCode());
+            allQty.setText(InventDB.getTotal(itemLastScan.get(qtyItem - 1).getItemCode(), "ITEM_INFO_EXP_REC"));
+        }
+
+
+        final ArrayList<ItemInfoExp> itemPreviousScan = new ArrayList<>();
+        itemCardsList = InventDB.getAllItemCard();
+
+//        final ArrayList<ItemCard> itemCardsList = itemCardsList;
+
+        itemCodeTextReceipt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count3) {
+
+                String itemCode = itemCodeTextReceipt.getText().toString();
+                if (!itemCode.equals("") && collReceipt && noEnterR[0]) {
+
+                    for (int i = 0; i < itemCardsList.size(); i++) {
+                        String itemCodeList = itemCardsList.get(i).getItemCode();
+                        if (itemCode.equals(itemCodeList)) {
+                            itemName.setText(itemCardsList.get(i).getItemName());
+                            Avl.setText(itemCardsList.get(i).getAVLQty());
+                            costPrc.setText(itemCardsList.get(i).getCostPrc());
+                            salePrc.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCardsList.get(i).getFDPRC()))));
+
+                            isFoundRec[0] = true;
+                            break;
+                        } else {
+                            isFoundRec[0] = false;
+                        }
+                    }
+
+                    if (isFoundRec[0]) {
+
+                        if (upDateQty.isChecked()) {
+                            save.setClickable(true);
+                            itemCodeTextReceipt.setEnabled(false);
+                            itemQty.setEnabled(true);
+
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    itemQty.requestFocus();
+                                }
+                            });
+
+                        } else {
+                            oldQty[0] = InventDB.getTotal(itemCode, "ITEM_INFO_EXP_REC");
+                            itemQty.setText("1");
+                            save.setClickable(false);
+                            itemCodeTextReceipt.setEnabled(false);
+                            itemQty.setEnabled(false);
+
+                            if (batchCheck.isChecked()) {
+                                if (!batchNo.getText().toString().equals("")) {
+
+                                    count[0]++;
+
+                                    saveFunction(itemCodeTextReceipt, itemName, itemQty, dateExp, 2, receiptNo.getText().toString(),
+                                            batchNo.getText().toString(), Avl, itemNameBefore, lastQty, allQty,
+                                            costPrc, salePrc, itemPreviousScan, count[0], save, itemCodeBefore, oldQty[0], serialRec[0]++);
+
+                                } else {
+                                    showAlertDialog("Batch Filed Empty Please Enter data");
+
+                                    new Handler().post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            batchNo.requestFocus();
+                                        }
+                                    });
+                                    save.setClickable(true);
+                                }
+                            } else {
+                                count[0]++;
+                                saveFunction(itemCodeTextReceipt, itemName, itemQty, dateExp, 2, receiptNo.getText().toString(),
+                                        "--", Avl, itemNameBefore, lastQty, allQty,
+                                        costPrc, salePrc, itemPreviousScan, count[0], save, itemCodeBefore, oldQty[0], serialRec[0]++);
+                            }
+
+
+                        }
+
+
+                    } else {
+                        showAlertDialog("This item not found please add this item before ");
+//                        Toast.makeText(CollectingData.this, "This item not found please add this item before ", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                itemCodeTextReceipt.requestFocus();
+                itemQty.setEnabled(true);
+                itemCodeTextReceipt.setEnabled(true);
+
+                save.setClickable(true);
+                itemCodeTextReceipt.setText("");
+                itemQty.setText("1");
+                itemName.setText("");
+                batchNo.setText("");
+                receiptNo.setText("");
+
+//                if (!itemPreviousScan.isEmpty()) {
+//                    itemNameBefore.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+//                    itemCodeBefore.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+//                    lastQty.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+//                    float AllQty = itemPreviousScan.get(count[0] - 1).getRowIndex() + itemPreviousScan.get(count[0] - 1).getItemQty();
+//                    allQty.setText("" + AllQty);
+//
+//                }
+            }
+        });
+
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                oldQty[0] = InventDB.getTotal(itemCodeTextReceipt.getText().toString(), "ITEM_INFO_EXP_REC");
+
+                if (!itemQty.getText().toString().equals("") && !itemCodeTextReceipt.getText().toString().equals("") && isFoundRec[0]) {
+                    if (batchCheck.isChecked()) {
+                        if (!batchNo.getText().toString().equals("")) {
+                            count[0]++;
+                            saveFunction(itemCodeTextReceipt, itemName, itemQty, dateExp, 2, receiptNo.getText().toString(),
+                                    "--", Avl, itemNameBefore, lastQty, allQty,
+                                    costPrc, salePrc, itemPreviousScan, count[0], save, itemCodeBefore, oldQty[0], serialRec[0]++);
+
+                        } else {
+                            showAlertDialog("Batch Filed Empty Please Enter data");
+
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    batchNo.requestFocus();
+                                }
+                            });
+
+
+                        }
+                    } else {
+                        count[0]++;
+                        saveFunction(itemCodeTextReceipt, itemName, itemQty, dateExp, 2, receiptNo.getText().toString(),
+                                "--", Avl, itemNameBefore, lastQty, allQty,
+                                costPrc, salePrc, itemPreviousScan, count[0], save, itemCodeBefore, oldQty[0], serialRec[0]++);
+                    }
+
+                } else {
+                    Toast.makeText(CollectingData.this, "please insert all data in field", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
+
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collReceipt = false;
+                noEnterR[0] = false;
+                dialog.dismiss();
+
+            }
+        });
+
+        dialog.show();
+    }
+
+
+    @SuppressLint("SetTextI18n")
+    void showTransferDialog() {
+        final Dialog dialogTransfer = new Dialog(CollectingData.this, R.style.Theme_Dialog);
+        dialogTransfer.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogTransfer.setCancelable(false);
+        if (controll.isYellow) {
+            dialogTransfer.setContentView(R.layout.transfer_data_yellow);
+        } else {
+            dialogTransfer.setContentView(R.layout.transfer_data);
+        }
+        dialogTransfer.setCanceledOnTouchOutside(false);
+
+
+
+        itemCardsList=InventDB.getAllItemCard();
+        String VHF = InventDB.getVhf();
+        int VHF_no =0;
+        if(!VHF.equals("")){
+            VHF_no= Integer.parseInt(VHF);
+        }else {
+            VHF_no=1;
+            InventDB.addVhf(new TransferVhfSerial(1));
+        }
+
+
+
+
+//
+        final ArrayList<TransferItemsInfo> itemPreviousScan = new ArrayList<>();
+
+        final int[] serialInfo = {InventDB.getAllTransferItemInfo().size()+1};
+
+
+
+        final String[] oldQty = {"0"};
+
+        final LinearLayout exit,save,search,news,endVhf,update;
+        final EditText Qty,ItemCode;
+        final Spinner from,to;
+        final TextView ItemName,ItemCodeBefor,ItemNameBefor,LastQ,LastAll,endVHFt;
+
+        ItemName =  dialogTransfer.findViewById(R.id.ItemName);
+        ItemCodeBefor =  dialogTransfer.findViewById(R.id.ItemBCode);
+        ItemNameBefor =  dialogTransfer.findViewById(R.id.ItemBName);
+        LastQ =  dialogTransfer.findViewById(R.id.Last);
+        LastAll =  dialogTransfer.findViewById(R.id.AllQty);
+        endVHFt=  dialogTransfer.findViewById(R.id.endVHFt);
+
+        Qty =  dialogTransfer.findViewById(R.id.Qty);
+        ItemCode =  dialogTransfer.findViewById(R.id.ItemCode);
+
+        from =  dialogTransfer.findViewById(R.id.fromS);
+        to =  dialogTransfer.findViewById(R.id.toS);
+
+
+        exit =  dialogTransfer.findViewById(R.id.exit);
+        save =  dialogTransfer.findViewById(R.id.save);
+        search =  dialogTransfer.findViewById(R.id.search);
+        news =  dialogTransfer.findViewById(R.id.newBu);
+        endVhf =  dialogTransfer.findViewById(R.id.endVHF);
+        update =  dialogTransfer.findViewById(R.id.updateBu);
+        final CheckBox updateCheck= dialogTransfer.findViewById(R.id.updateCheckBox);
+
+        final int[] count = {0};
+        final Boolean[] isFound = {false};
+        final boolean[] upDateClick = {false};
+        final boolean[] Enterin = {true};
+
+        ItemCode.requestFocus();
+        Qty.setEnabled(true);
+        ItemCode.setEnabled(true);
+
+        from.setEnabled(true);
+        to.setEnabled(true);
+
+        save.setClickable(true);
+        ItemCode.setText("");
+        Qty.setText("1");
+        ItemName.setText("");
+        endVHFt.setText(""+(VHF_no));
+
+
+        ArrayList<TransferItemsInfo> itemLastScan = new ArrayList<>();
+
+        itemLastScan = InventDB.getAllTransferItemInfo();
+
+        if (!itemLastScan.isEmpty()) {
+            int qtyItem = itemLastScan.size();
+            ItemNameBefor.setText(itemLastScan.get(qtyItem - 1).getItemName());
+            LastQ.setText("" + itemLastScan.get(qtyItem - 1).getItemQty());
+            ItemCodeBefor.setText(itemLastScan.get(qtyItem - 1).getItemCode());
+            LastAll.setText(InventDB.getTotal(itemLastScan.get(qtyItem - 1).getItemCode(), "TRANSFER_ITEMS_INFO"));
+
+        }
+
+
+        itemCardsList=InventDB.getAllItemCard();
+        final String[] fromStore = new String[1];
+        final String[] ToStore = new String[1];
+
+        final List<Stk> STKList = InventDB.getAllStk();
+        final List<String> StokNo = new ArrayList<>();
+        ArrayAdapter<String> StkAdapter;
+        if (STKList.size() != 0) {
+            StokNo.clear();
+            for (int i = 0; i < STKList.size(); i++) {
+                StokNo.add(STKList.get(i).getStkNo());
+            }
+
+            StkAdapter = new ArrayAdapter<String>(CollectingData.this, R.layout.spinner_style, StokNo);
+            from.setAdapter(StkAdapter);
+
+            StkAdapter = new ArrayAdapter<String>(CollectingData.this, R.layout.spinner_style, StokNo);
+            to.setAdapter(StkAdapter);
+        }
+
+
+
+        endVhf.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                int i= finalVHF_no1 +1;
+
+                int i=0;
+                String VHF = InventDB.getVhf();
+                int VHF_no = InventDB.getMax();
+                if(!VHF.equals("")){
+                    if(Integer.parseInt(VHF)==VHF_no){
+                         i= VHF_no +1;
+                        InventDB.updateVhfNo(""+i);
+                    }else if(Integer.parseInt(VHF)>=VHF_no){
+                        i= Integer.parseInt(VHF);
+                    }
+
+                }else {
+
+                    InventDB.addVhf(new TransferVhfSerial(VHF_no));
+                }
+
+                endVHFt.setText("" +i);
+                from.setEnabled(true);
+                to.setEnabled(true);
+            }
+        });
+
+
+        news.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collTransfer = false;
+                editText = ItemCode;
+                openSave = true;
+
+                showNewItemDialog(4);
+            }
+        });
+
+        from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                fromStore[0] =StokNo.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        updateCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (updateCheck.isChecked()) {
+                    upDateClick[0] = true;
+                } else {
+                    upDateClick[0] = false;
+                }
+            }
+        });
+
+        to.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                ToStore[0] =StokNo.get(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearch = true;
+                collTransfer = false;
+                SearchDialog(ItemCode, 4);
+            }
+        });
+
+
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                collTransfer = false;
+                itemUpdateTransfer = InventDB.getAllTransferItemInfo();
+                updateOpen = true;
+                upDateDialog(ItemCodeBefor, 3, ItemCode, LastAll);
+
+            }
+        });
+
+
+
+        ItemCode.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_NULL) {
+//                    if (isEnter[0]) {
+//                        if (!isFound[0]) {
+//                            showAlertDialog("This item not found please add this item before ");
+//                            new Handler().post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    itemCodeText.requestFocus();
+//                                }
+//                            });
+//
+//                            itemQty.setEnabled(true);
+//                            itemCodeText.setEnabled(true);
+//
+//                            save.setClickable(true);
+//                            itemCodeText.setText("");
+//                            itemQty.setText("1");
+//                            itemName.setText("");
+//                            salePrice.setText("");
+//                            itemLocation.setText("");
+//                            isEnter[0] = false;
+//                        }
+//
+//                    }
+
+                    if(Enterin[0]){
+                    String itemCode = ItemCode.getText().toString();
+                    String itemSwitch = "";
+                    Enterin[0] =false;
+
+                    if (!itemCode.equals("") && collTransfer) {
+
+
+                        Log.e("itemCardsList.size()", "-->" + itemCardsList.size());
+
+                        itemSwitch = findSwitch(itemCode);
+                        if (!itemSwitch.equals("")) {
+                            itemCode = itemSwitch;
+                        }
+
+                        for (int i = 0; i < itemCardsList.size(); i++) {
+                            String itemCodeList = itemCardsList.get(i).getItemCode();
+                            if (itemCode.equals(itemCodeList)) {
+                                isFound[0] = true;
+
+                                ItemName.setText(itemCardsList.get(i).getItemName());
+
+
+                                break;
+                            } else {
+                                isFound[0] = false;
+                            }
+                        }
+
+
+                        if (isFound[0]) {
+
+
+                            if (upDateClick[0]) {
+                                save.setClickable(true);
+                                ItemCode.setEnabled(false);
+                                Qty.setEnabled(true);
+
+
+//                                itemQty.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//                                    @Override
+//                                    public void onFocusChange(View v, boolean hasFocus) {
+//                                        if (!hasFocus){
+//                                            // TODO: the editText has just been left
+//                                            if(ExpClick[0]){
+//                                                TimeDialog(itemDate);
+//                                            }
+//                                        }
+//
+//                                    }
+//                                });
+
+
+                                if (event != null) {
+                                    if (event.getKeyCode() == KeyEvent.KEYCODE_ENTER || event.getKeyCode() == KeyEvent.ACTION_DOWN) {
+
+                                        ItemName.requestFocus();
+
+                                    } else {
+                                        Qty.requestFocus();
+                                    }
+                                } else {
+                                    new Handler().post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Qty.requestFocus();
+                                        }
+                                    });
+
+                                }
+
+
+//                            Toast.makeText(CollectingData.this, "save no auto", Toast.LENGTH_SHORT).show();
+                            } else {
+//                            Toast.makeText(CollectingData.this, "save auto", Toast.LENGTH_SHORT).show();
+                                oldQty[0] = InventDB.getTotal(itemCode, "TRANSFER_ITEMS_INFO");
+                                Qty.setText("1");
+                                save.setClickable(false);
+                                ItemCode.setEnabled(false);
+                                ItemName.setEnabled(false);
+
+                                TransferItemsInfo item = new TransferItemsInfo();
+
+                                String Lo = "";
+
+                                List<MainSetting> mainSettings = InventDB.getAllMainSetting();
+                                if (mainSettings.size() != 0) {
+                                    Lo = mainSettings.get(0).getStorNo();
+                                }
+
+                                item.setItemCode(itemCode);
+                                item.setItemName(ItemName.getText().toString());
+                                item.setItemQty(Float.parseFloat(Qty.getText().toString()));
+                                item.setRowIndex(serialInfo[0]++);
+                                item.setFromStr(fromStore[0]);
+                                item.setToStr(ToStore[0]);
+                                item.setVhfNo(Integer.parseInt(endVHFt.getText().toString()));
+                                Log.e("Store", "===>" + fromStore[0] + "--->" + ToStore[0]);
+                                item.setIsExport("0");
+
+                                InventDB.addItemTransferInfo(item);
+
+
+                                item.setTotalQty(oldQty[0]);
+                                Log.e("ol12", "===>" + oldQty[0]);
+                                itemPreviousScan.add(item);
+//                            Toast.makeText(CollectingData.this, "Saved Successfully ", Toast.LENGTH_SHORT).show();
+                                count[0]++;
+
+                                progressDialog();
+
+////////////////////////////////CLEAR ////////
+
+
+                                new Handler().post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        ItemCode.requestFocus();
+                                    }
+                                });
+
+                                from.setEnabled(false);
+                                to.setEnabled(false);
+                                Qty.setEnabled(true);
+                                ItemCode.setEnabled(true);
+
+
+                                save.setClickable(true);
+                                ItemCode.setText("");
+                                Qty.setText("1");
+                                ItemName.setText("");
+//                                itemLocation.setText("");
+
+                                if (!itemPreviousScan.isEmpty()) {
+                                    ItemNameBefor.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+                                    ItemCodeBefor.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+                                    LastQ.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+
+                                    float AllQty = Float.parseFloat(itemPreviousScan.get(count[0] - 1).getTotalQty()) + itemPreviousScan.get(count[0] - 1).getItemQty();
+                                    LastAll.setText("" + AllQty);
+
+
+                                }
+
+
+                            }
+
+
+                        } else {
+
+                            showAlertDialog(CollectingData.this.getResources().getString(R.string.itemNotFoundAlert));
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ItemCode.requestFocus();
+                                }
+                            });
+
+                            from.setEnabled(false);
+                            to.setEnabled(false);
+
+                            Qty.setEnabled(true);
+                            ItemCode.setEnabled(true);
+
+                            save.setClickable(true);
+                            ItemCode.setText("");
+                            Qty.setText("1");
+                            ItemName.setText("");
+
+//                            itemLocation.setText("");
+
+
+//                        showAlertDialog("This item not found please add this item before ");
+//                        Toast.makeText(CollectingData.this, "This item not found please add this item before ", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                        Enterin[0] =true;
+                }
+
+
+                }
+
+
+                return false;
+            }
+        });
+
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                transferData.setClickable(true);
+                dialogTransfer.dismiss();
+            }
+        });
+
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+String itemSwitch;
+String itemCode=ItemCode.getText().toString();
+                itemSwitch=findSwitch(itemCode);
+                if(!itemSwitch.equals("")){
+                    itemCode=itemSwitch;
+                }
+
+
+
+                if (!Qty.getText().toString().equals("")&& !itemCode.equals("") && isFound[0]) {
+                    oldQty[0] = InventDB.getTotal(itemCode, "TRANSFER_ITEMS_INFO");
+                    TransferItemsInfo item = new TransferItemsInfo();
+
+                    String Lo="";
+                    item.setItemCode(itemCode);
+                    item.setItemName(ItemName.getText().toString());
+                    item.setItemQty(Float.parseFloat(Qty.getText().toString()));
+                    item.setToStr(ToStore[0]);
+                    item.setFromStr(fromStore[0]);
+
+//                    List<MainSetting>mainSettings=InventDB.getAllMainSetting();
+//                    if(mainSettings.size()!=0){
+//                        Lo=mainSettings.get(0).getStorNo();
+//                    }
+                    item.setIsExport("0");
+                    item.setRowIndex(serialInfo[0]++);
+                    item.setVhfNo(Integer.parseInt(endVHFt.getText().toString()));
+                    InventDB.addItemTransferInfo(item);
+                    item.setTotalQty( oldQty[0] );
+                    itemPreviousScan.add(item);
+                    count[0]++;
+
+                    progressDialog();
+                    ////////CLEAR ///
+
+                    ItemCode.requestFocus();
+                    Qty.setEnabled(true);
+                    ItemCode.setEnabled(true);
+
+
+                    from.setEnabled(false);
+                    to.setEnabled(false);
+
+                    save.setClickable(true);
+                    ItemCode.setText("");
+                    Qty.setText("1");
+                    ItemName.setText("");
+
+//                    itemLocation.setText("");
+
+                    if (!itemPreviousScan.isEmpty()) {
+                        ItemNameBefor.setText(itemPreviousScan.get(count[0] - 1).getItemName());
+                        ItemCodeBefor.setText(itemPreviousScan.get(count[0] - 1).getItemCode());
+                        LastQ.setText("" + itemPreviousScan.get(count[0] - 1).getItemQty());
+                        float AllQty =Float.parseFloat(itemPreviousScan.get(count[0] - 1).getTotalQty()) + itemPreviousScan.get(count[0] - 1).getItemQty();
+                        LastAll.setText("" + AllQty);
+
+
+                    }
+
+                } else {
+//                    Toast.makeText(CollectingData.this, CollectingData.this.getResources().getString(R.string.insertData), Toast.LENGTH_SHORT).show();
+                    TostMesage(CollectingData.this.getResources().getString(R.string.insertData));
+                }
+
+
+
+
+            }
+        });
+
+        dialogTransfer.show();
+    }
+
+    void saveFunction(EditText itemCodeText1, TextView itemName, EditText itemQty, TextView itemDate, int switches, String receiptNo,
+                      String batchText, TextView itemAvl, TextView itemNameBefor, TextView itemLastBe, TextView itemAlBe,
+                      TextView itemCodeP, TextView itemSaleP, ArrayList<ItemInfoExp> itemPreviousScan, int count, Button save, TextView itemCodeBefor, String oldQty, int serial) {
+
+
+        ItemInfoExp item = new ItemInfoExp();
+
+
+        item.setItemCode(itemCodeText1.getText().toString());
+        item.setItemName(itemName.getText().toString());
+        item.setItemQty(Float.parseFloat(itemQty.getText().toString()));
+        item.setExpDate(itemDate.getText().toString());
+        item.setBatchNo(batchText);
+        item.setRowIndex(Float.parseFloat("0.0"));
+        item.setAVLQTY(itemAvl.getText().toString());
+        item.setCostPrc(itemCodeP.getText().toString());
+        item.setSalePrc(itemSaleP.getText().toString());
+        item.setReceiptNo(receiptNo);
+
+        switch (switches) {
+            case 1:
+
+                item.setSerialNo(serial);
+                InventDB.addItemInfoExp(item);
+                break;
+            case 2:
+                serial = InventDB.getAllItemInfoExpRec().size();
+                item.setSerialNo(serial);
+                InventDB.addItemInfoReceipt(item);
+                break;
+        }
+
+        item.setRowIndex(Float.parseFloat(oldQty));
+        itemPreviousScan.add(item);
+
+        progressDialog();
+
+////////////////////////////////CLEAR ////////
+
+        itemCodeText1.requestFocus();
+        itemQty.setEnabled(true);
+        itemCodeText1.setEnabled(true);
+
+        save.setClickable(true);
+        itemCodeText1.setText("");
+        itemQty.setText("1");
+        itemName.setText("");
+        itemAvl.setText("");
+        itemCodeP.setText("");
+        itemSaleP.setText("");
+
+
+        if (!itemPreviousScan.isEmpty()) {
+            itemNameBefor.setText(itemPreviousScan.get(count - 1).getItemName());
+            itemCodeBefor.setText(itemPreviousScan.get(count - 1).getItemCode());
+            itemLastBe.setText("" + itemPreviousScan.get(count - 1).getItemQty());
+
+            float AllQty = itemPreviousScan.get(count - 1).getRowIndex() + itemPreviousScan.get(count - 1).getItemQty();
+            itemAlBe.setText("" + AllQty);
+
+
+        }
+
+
+    }
+
+
+    void upDateDialog(final TextView edit1, final int switches, final EditText edit, final TextView AllQty) {
+        final Dialog dialogUpdate = new Dialog(CollectingData.this, R.style.Theme_Dialog);
+        dialogUpdate.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogUpdate.setCancelable(false);
+        if (controll.isYellow) {
+            dialogUpdate.setContentView(R.layout.update_layout_yellow);
+        } else {
+            dialogUpdate.setContentView(R.layout.update_layout);
+        }
+
+        dialogUpdate.setCanceledOnTouchOutside(false);
+        final TableLayout recipeTable = (TableLayout) dialogUpdate.findViewById(R.id.Table);
+
+        final EditText ItemCodeT;
+        ItemCodeT = (EditText) dialogUpdate.findViewById(R.id.itemCodeUp);
+
+        ItemCodeT.requestFocus();
+        edit.setEnabled(false);
+
+        final String ItemCode = ItemCodeT.getText().toString();
+
+        LinearLayout done, exit;
+        exit = dialogUpdate.findViewById(R.id.exit);
+        done = dialogUpdate.findViewById(R.id.done);
+
+        ///////////////////////////////////////////////////////////////////////////
+
+        TextWatcher item = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                recipeTable.removeAllViews();
+                if (updateOpen && !ItemCodeT.getText().toString().equals("")) {
+
+                    switch (switches) {
+                        case 0:
+                            for (int i = 0; i < itemUpdate.size(); i++) {
+                                if (itemUpdate.get(i).getItemCode().contains(ItemCodeT.getText().toString()) || itemUpdate.get(i).getItemName().contains(ItemCodeT.getText().toString())) {
+                                    insertRowUpdate(itemUpdate.get(i).getItemCode(), itemUpdate.get(i).getItemName(), String.valueOf(itemUpdate.get(i).getSerialNo()),
+                                            String.valueOf(itemUpdate.get(i).getItemQty()), recipeTable);
+                                }
+
+                            }
+                            break;
+                        case 1:
+
+                            for (int i = 0; i < itemUpdateExp.size(); i++) {
+                                if (itemUpdateExp.get(i).getItemCode().contains(ItemCodeT.getText().toString()) || itemUpdateExp.get(i).getItemName().contains(ItemCodeT.getText().toString())) {
+                                    insertRowUpdate(itemUpdateExp.get(i).getItemCode(), itemUpdateExp.get(i).getItemName(), String.valueOf(itemUpdateExp.get(i).getSerialNo()),
+                                            String.valueOf(itemUpdateExp.get(i).getItemQty()), recipeTable);
+                                }
+
+                            }
+
+                            break;
+                        case 2:
+                            for (int i = 0; i < itemUpdateExpRec.size(); i++) {
+                                if (itemUpdateExpRec.get(i).getItemCode().contains(ItemCodeT.getText().toString()) || itemUpdateExpRec.get(i).getItemName().contains(ItemCodeT.getText().toString())) {
+                                    insertRowUpdate(itemUpdateExpRec.get(i).getItemCode(), itemUpdateExpRec.get(i).getItemName(), String.valueOf(itemUpdateExpRec.get(i).getSerialNo()),
+                                            String.valueOf(itemUpdateExpRec.get(i).getItemQty()), recipeTable);
+                                }
+
+                            }
+                            break;
+
+                        case 3:
+                            for (int i = 0; i < itemUpdateTransfer.size(); i++) {
+                                if (itemUpdateTransfer.get(i).getItemCode().contains(ItemCodeT.getText().toString()) || itemUpdateTransfer.get(i).getItemName().contains(ItemCodeT.getText().toString())) {
+                                    insertRowUpdate(itemUpdateTransfer.get(i).getItemCode(), itemUpdateTransfer.get(i).getItemName(), String.valueOf(itemUpdateTransfer.get(i).getRowIndex()),
+                                            String.valueOf(itemUpdateTransfer.get(i).getItemQty()), recipeTable);
+                                }
+
+                            }
+                            break;
+
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+            }
+        };
+
+        ItemCodeT.addTextChangedListener(item);
+        ItemCodeT.setText(edit1.getText().toString());
+
+
+        ///////////////////////////////////////////////////////////////////////////
+
+
+//        ItemCodeT.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                recipeTable.removeAllViews();
+//                if (updateOpen && !ItemCodeT.getText().toString().equals("")) {
+//
+//                    switch (switches) {
+//                        case 0:
+//                            for (int i = 0; i < itemUpdate.size(); i++) {
+//                                if (itemUpdate.get(i).getItemCode().contains(ItemCodeT.getText().toString()) || itemUpdate.get(i).getItemName().contains(ItemCodeT.getText().toString())) {
+//                                    insertRowUpdate(itemUpdate.get(i).getItemCode(), itemUpdate.get(i).getItemName(), String.valueOf(itemUpdate.get(i).getSerialNo()),
+//                                            String.valueOf(itemUpdate.get(i).getItemQty()), recipeTable);
+//                                }
+//
+//                            }
+//                            break;
+//                        case 1:
+//
+//                            for (int i = 0; i < itemUpdateExp.size(); i++) {
+//                                if (itemUpdateExp.get(i).getItemCode().contains(ItemCodeT.getText().toString()) || itemUpdateExp.get(i).getItemName().contains(ItemCodeT.getText().toString())) {
+//                                    insertRowUpdate(itemUpdateExp.get(i).getItemCode(), itemUpdateExp.get(i).getItemName(), String.valueOf(itemUpdateExp.get(i).getSerialNo()),
+//                                            String.valueOf(itemUpdateExp.get(i).getItemQty()), recipeTable);
+//                                }
+//
+//                            }
+//
+//                            break;
+//                        case 2:
+//                            for (int i = 0; i < itemUpdateExpRec.size(); i++) {
+//                                if (itemUpdateExpRec.get(i).getItemCode().contains(ItemCodeT.getText().toString()) || itemUpdateExpRec.get(i).getItemName().contains(ItemCodeT.getText().toString())) {
+//                                    insertRowUpdate(itemUpdateExpRec.get(i).getItemCode(), itemUpdateExpRec.get(i).getItemName(), String.valueOf(itemUpdateExpRec.get(i).getSerialNo()),
+//                                            String.valueOf(itemUpdateExpRec.get(i).getItemQty()), recipeTable);
+//                                }
+//
+//                            }
+//                            break;
+//
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//            }
+//        });
+
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String Serial, newValue, itemCode;
+                boolean AllTrue = false;
+
+                for (int i = 0; i < recipeTable.getChildCount(); i++) {
+                    TableRow t = (TableRow) recipeTable.getChildAt(i);
+                    TextView ItemCode = (TextView) t.getChildAt(0);
+                    TextView upQty = (TextView) t.getChildAt(3);
+                    if (!upQty.getText().toString().equals("") && !upQty.getText().toString().equals("0")) {
+                        Serial = ItemCode.getTag().toString();
+                        newValue = upQty.getText().toString();
+                        itemCode = ItemCode.getText().toString();
+                        switch (switches) {
+                            case 0:
+                                InventDB.updateExpTable("ITEMS_INFO", newValue, Serial, itemCode);
+//                                allQty.setText(InventDB.getTotal(itemCode, "ITEMS_INFO"));
+                                break;
+                            case 1:
+                                InventDB.updateExpTable("ITEM_INFO_EXP", newValue, Serial, itemCode);
+//                                allQty.setText(InventDB.getTotal(itemCode, "ITEM_INFO_EXP"));
+                                break;
+                            case 2:
+                                InventDB.updateExpTable("ITEM_INFO_EXP_REC", newValue, Serial, itemCode);
+//                                allQty.setText(InventDB.getTotal(itemCode, "ITEM_INFO_EXP_REC"));
+                                break;
+                            case 3:
+                                InventDB.updateTransferTable("TRANSFER_ITEMS_INFO", newValue, Serial, itemCode);
+//                                allQty.setText(InventDB.getTotal(itemCode, "ITEM_INFO_EXP_REC"));
+                                break;
+                        }
+
+                        if (edit1.getText().toString().equals(itemCode)) {
+                            AllTrue = true;
+                        }
+
+                    }
+
+                }
+
+                switch (switches) {
+                    case 0:
+                        collDOpen = true;
+                        if (AllTrue) {
+                            AllQty.setText(InventDB.getTotal(edit1.getText().toString(), "ITEMS_INFO"));
+                        }
+                        break;
+                    case 1:
+                        collExOpen = true;
+                        if (AllTrue) {
+                            AllQty.setText(InventDB.getTotal(edit1.getText().toString(), "ITEM_INFO_EXP"));
+                        }
+                        break;
+                    case 2:
+                        collReceipt = true;
+                        if (AllTrue) {
+                            AllQty.setText(InventDB.getTotal(edit1.getText().toString(), "ITEM_INFO_EXP_REC"));
+                        }
+                        break;
+                    case 3:
+                        collTransfer = true;
+                        if (AllTrue) {
+                            AllQty.setText(InventDB.getTotal(edit1.getText().toString(), "TRANSFER_ITEMS_INFO"));
+                        }
+                        break;
+                }
+
+                updateOpen = false;
+                edit.requestFocus();
+                edit.setEnabled(true);
+                edit.setText("");
+                dialogUpdate.dismiss();
+            }
+        });
+
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (switches) {
+                    case 0:
+                        collDOpen = true;
+                        break;
+                    case 1:
+                        collExOpen = true;
+                        break;
+                    case 2:
+                        collReceipt = true;
+                        break;
+                    case 3:
+                        collTransfer = true;
+                        break;
+                }
+                updateOpen = false;
+                edit.requestFocus();
+                edit.setEnabled(true);
+                edit.setText("");
+                dialogUpdate.dismiss();
+            }
+        });
+
+        dialogUpdate.show();
+
+
+    }
+
+    void insertRowUpdate(String itemCodes, String itemName, String serial, String itemQty, TableLayout recipeTable) {
+
+
+        row = new TableRow(CollectingData.this);
+        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+        row.setLayoutParams(lp);
+
+        for (int i = 0; i < 4; i++) {
+            final EditText editText = new EditText(CollectingData.this);
+            final TextView textView = new TextView(CollectingData.this);
+            if (i == 3) {
+                editText.setTextColor(ContextCompat.getColor(CollectingData.this, R.color.ExitButton));
+                editText.setGravity(Gravity.CENTER);
+                editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+                TableRow.LayoutParams lp2 = new TableRow.LayoutParams(100, 100, 1.0f);
+                editText.setLayoutParams(lp2);
+                editText.setText("0");
+//                editText.setBackgroundColor(getResources().getColor(R.color.freeButton));
+                //                editText.setId(Integer.parseInt(textId + "3"));
+                row.addView(editText);
+
+            } else {
+                switch (i) {
+                    case 0:
+                        textView.setText(itemCodes);
+                        textView.setTag(serial);
+                        break;
+                    case 1:
+                        textView.setText(itemName);
+                        break;
+                    case 2:
+                        textView.setText(itemQty);
+                        break;
+
+
+                }
+                textView.setTextColor(ContextCompat.getColor(CollectingData.this, R.color.white));
+                textView.setGravity(Gravity.CENTER);
+
+//                textView.setId(Integer.parseInt(textId + "" + i));
+
+                TableRow.LayoutParams lp2 = new TableRow.LayoutParams(100, TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
+                textView.setLayoutParams(lp2);
+
+
+                row.addView(textView);
+
+            }
+
+        }
+//        row.setId(textId);
+        recipeTable.addView(row);
+//        textId++;
+
+
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    void SearchDialog(final EditText itemCodeText, final int swSearch) {
+        final Dialog dialogSearch = new Dialog(CollectingData.this, R.style.Theme_Dialog);
+        dialogSearch.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogSearch.setCancelable(false);
+        if (controll.isYellow) {
+            dialogSearch.setContentView(R.layout.search_dialog_yellow);
+        } else {
+            dialogSearch.setContentView(R.layout.search_dialog);
+        }
+
+        dialogSearch.setCanceledOnTouchOutside(false);
+
+        LinearLayout exit = dialogSearch.findViewById(R.id.exitsearch);
+        final EditText itemCodeSearch = (EditText) dialogSearch.findViewById(R.id.itemCodeSearch);
+        final ListView tabeSearch = (ListView) dialogSearch.findViewById(R.id.tableSearch);
+
+
+        itemCodeCard = new ArrayList<>();
+        itemCodeCard = InventDB.getAllItemCard();
+
+
+        final ListAdapterSearch listAdapterSearch = new ListAdapterSearch(CollectingData.this, itemCodeCard);
+        tabeSearch.setAdapter(listAdapterSearch);
+
+        final ArrayList<ItemCard> ItemCodeCardSearch = new ArrayList<>();
+        for (int i = 0; i < itemCodeCard.size(); i++) {
+//            insertRowSearch(itemCodeCard.get(i).getItemName(), itemCodeCard.get(i).getItemCode(), tabeSearch, dialogSearch, itemCodeText, swSearch);
+            ItemCard itemCard = itemCodeCard.get(i);
+            ItemCodeCardSearch.add(itemCard);
+
+        }
+
+        itemCodeSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String itemCodeReader = itemCodeSearch.getText().toString();
+                ItemCodeCardSearch.clear();
+                if (!itemCodeReader.equals("")) {
+                    if (openSearch) {
+
+                        for (int i = 0; i < itemCodeCard.size(); i++) {
+                            if (itemCodeCard.get(i).getItemCode().contains(itemCodeReader) || itemCodeCard.get(i).getItemName().contains(itemCodeReader)) {
+//                            insertRowSearch(finalItemCodeCard.get(i).getItemName(), finalItemCodeCard.get(i).getItemCode(), tabeSearch, dialogSearch, itemCodeText, swSearch);
+                                ItemCard itemCard = itemCodeCard.get(i);
+                                ItemCodeCardSearch.add(itemCard);
+                            }
+                            ListAdapterSearch listAdapterSearch = new ListAdapterSearch(CollectingData.this, ItemCodeCardSearch);
+                            tabeSearch.setAdapter(listAdapterSearch);
+                        }
+                    }
+                } else {
+
+                    ListAdapterSearch listAdapterSearch = new ListAdapterSearch(CollectingData.this, itemCodeCard);
+                    tabeSearch.setAdapter(listAdapterSearch);
+
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+        tabeSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                openSearch = false;
+                switch (swSearch) {
+                    case 0:
+                        collDOpen = true;
+                        break;
+                    case 1:
+                        collExOpen = true;
+                        break;
+                    case 2:
+                        collReceipt = true;
+                        break;
+                    case 3:
+                        openSave = true;
+                        break;
+                    case 4:
+                        collTransfer = true;
+                        break;
+                }
+
+//                Log.e("rowid,", "...." + "" + v.getId() + "----->" + text.getText().toString());
+
+                itemCodeText.setText(ItemCodeCardSearch.get(position).getItemCode());
+                textId = 0;
+                dialogSearch.dismiss();
+
+            }
+        });
+
+        tabeSearch.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+//                Log.v(TAG, "CHILD TOUCH");
+
+                // Disallow the touch request for parent scroll on touch of  child view
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogSearch.dismiss();
+                openSearch = false;
+                switch (swSearch) {
+                    case 0:
+                        collDOpen = true;
+                        break;
+                    case 1:
+                        collExOpen = true;
+                        break;
+                    case 2:
+                        collReceipt = true;
+                        break;
+                    case 3:
+                        openSave = true;
+                        break;
+                }
+                itemCodeText.requestFocus();
+                itemCodeText.setText("");
+                textId = 0;
+            }
+        });
+
+
+        dialogSearch.show();
+
+    }
+
+    void insertRowSearch(String itemName, String itemCode, TableLayout recipeTable, final Dialog dialogFinsh, final EditText itemCodeText, final int swSearch) {
+
+
+        row = new TableRow(CollectingData.this);
+        TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+        row.setLayoutParams(lp);
+        row.setPadding(0, 5, 0, 20);
+
+        for (int i = 0; i < 2; i++) {
+            final TextView textView = new TextView(CollectingData.this);
+            switch (i) {
+                case 0:
+                    textView.setText(itemCode);
+                    break;
+                case 1:
+                    textView.setText(itemName);
+                    break;
+
+
+            }
+            textView.setTextColor(ContextCompat.getColor(CollectingData.this, R.color.textColor));
+            textView.setGravity(Gravity.CENTER);
+
+            textView.setId(Integer.parseInt(textId + "" + i));
+
+            TableRow.LayoutParams lp2 = new TableRow.LayoutParams(100, TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
+            textView.setLayoutParams(lp2);
+
+            row.addView(textView);
+
+
+        }
+        row.setId(textId);
+        row.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                TableRow rows = (TableRow) v.findViewById(v.getId());
+                TextView text = (TextView) rows.getChildAt(0);
+                openSearch = false;
+                switch (swSearch) {
+                    case 0:
+                        collDOpen = true;
+                        break;
+                    case 1:
+                        collExOpen = true;
+                        break;
+                    case 2:
+                        collReceipt = true;
+                        break;
+                    case 3:
+                        openSave = true;
+                        break;
+                }
+
+                Log.e("rowid,", "...." + "" + v.getId() + "----->" + text.getText().toString());
+
+                itemCodeText.setText(text.getText().toString());
+                textId = 0;
+                dialogFinsh.dismiss();
+            }
+        });
+
+
+        recipeTable.addView(row);
+        textId++;
+    }
+
+
+    public void Clickable() {
+
+        collectData.setClickable(true);
+        collectByORG.setClickable(true);
+        transferData.setClickable(true);
+        collectingByExpiry.setClickable(true);
+        collectByReceipt.setClickable(true);
+
+//        pSetting.setClickable(true);
+//        changePassword.setClickable(true);
+//        sendServer.setClickable(true);
+//        receiveServer.setClickable(true);
+//
+//        newItem.setClickable(true);
+//        importText.setClickable(true);
+//        pBarcode.setClickable(true);
+//        pShelfTag.setClickable(true);
+//
+//        exportText.setClickable(true);
+//        ExportTransfer.setClickable(true);
+//        exportExpDate.setClickable(true);
+//        ExportAlternative.setClickable(true);
+    }
+
+    public void notClickable() {
+        collectData.setClickable(false);
+        collectByORG.setClickable(false);
+        transferData.setClickable(false);
+        collectingByExpiry.setClickable(false);
+        collectByReceipt.setClickable(false);
+
+//        pSetting.setClickable(false);
+//        changePassword.setClickable(false);
+//        sendServer.setClickable(false);
+//        receiveServer.setClickable(false);
+//
+//        newItem.setClickable(false);
+//        importText.setClickable(false);
+//        pBarcode.setClickable(false);
+//        pShelfTag.setClickable(false);
+//
+//        exportText.setClickable(false);
+//        ExportTransfer.setClickable(false);
+//        exportExpDate.setClickable(false);
+//        ExportAlternative.setClickable(false);
+    }
+
+    void alertMessageDialog(String title, String message, final int swith, final String itemName, final String ItemCode) {
+//        AlertDialog.Builder dialog = new AlertDialog.Builder(CollectingData.this);
+//        dialog.setTitle(title)
+//                .setMessage(message)
+//                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialoginterface, int i) {
+//                        dialoginterface.cancel();
+//                    }
+//                })
+//                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialoginterface, int i) {
+//                        switch (swith) {
+//                            case 0:
+//                                finish();
+//                                moveTaskToBack(true);
+//
+//                                break;
+//                            case 1:
+//                                InventDB.deleteAllItem("ITEM_CARD");
+//                                Toast.makeText(CollectingData.this, "All Item Delete ", Toast.LENGTH_SHORT).show();
+////                             progressDialog();
+//                                break;
+//                            case 2:
+//                                InventDB.delete(ItemCode, itemName);
+//                                break;
+//
+//                        }
+//                    }
+//                }).show();
+
+
+        new SweetAlertDialog(CollectingData.this, SweetAlertDialog.WARNING_TYPE)
+                .setTitleText(CollectingData.this.getResources().getString(R.string.areYouSurre)+title)
+                .setContentText(message)
+                .setConfirmText(title+"!")
+                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+//
+                        switch (swith) {
+                            case 0:
+                                finish();
+                                moveTaskToBack(true);
+                                sDialog.dismissWithAnimation();
+
+
+                                break;
+                            case 1:
+                                InventDB.deleteAllItem("ITEM_CARD");
+
+                                Toast.makeText(CollectingData.this, CollectingData.this.getResources().getString(R.string.allItemDelete), Toast.LENGTH_SHORT).show();
+//                             progressDialog();
+                                sDialog.dismissWithAnimation();
+
+                                break;
+                            case 2:
+                                InventDB.delete(ItemCode, itemName);
+                                sDialog.dismissWithAnimation();
+
+                                break;
+
+                        }
+
+
+                    }
+                })
+                .setCancelButton(CollectingData.this.getResources().getString(R.string.cancel), new SweetAlertDialog.OnSweetClickListener() {
+                    @Override
+                    public void onClick(SweetAlertDialog sDialog) {
+                        sDialog.dismissWithAnimation();
+                    }
+                })
+                .show();
+
+
+
+    }
+
+//    public void visibilityLayout(RelativeLayout ins) {
+//        main.setVisibility(View.VISIBLE);
+//        mainR.setVisibility(View.VISIBLE);
+//        secondR.setVisibility(View.INVISIBLE);
+//        collectR.setVisibility(View.INVISIBLE);
+//        itemR.setVisibility(View.INVISIBLE);
+//        reportR.setVisibility(View.INVISIBLE);
+//        toolsR.setVisibility(View.INVISIBLE);
+//
+//        ins.setVisibility(View.VISIBLE);
+//
+//    }
+
+
+    void TostMesage(String message){
+
+//        new SweetAlertDialog(CollectingData.this, SweetAlertDialog.WARNING_TYPE)
+//                .setTitleText("Are you sure?")
+//                .setContentText("Won't be able to recover this file!")
+//                .setConfirmText("Yes,delete it!")
+//                .setConfirmClickListener(new SweetAlertDialog.OnSweetClickListener() {
+//                    @Override
+//                    public void onClick(SweetAlertDialog sDialog) {
+//                        sDialog
+//                                .setTitleText("Deleted!")
+//                                .setContentText("Your imaginary file has been deleted!")
+//                                .setConfirmText("OK")
+//                                .setConfirmClickListener(null)
+//                                .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+//                    }
+//                })
+//                .show();
+
+        SweetAlertDialog sd2 = new SweetAlertDialog(this);
+        sd2.setCancelable(true);
+        sd2.setCanceledOnTouchOutside(true);
+        sd2.setContentText(message);
+        sd2.hideConfirmButton();
+        sd2.show();
+
+
+    }
+
+    void progressDialog() {
+
+        final ProgressDialog progressDialog = new ProgressDialog(CollectingData.this);
+        progressDialog.setMessage("Saving Success ..."); // Setting Message
+        progressDialog.setTitle("Saving ..."); // Setting Title
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER); // Progress Dialog Style Spinner
+        progressDialog.show(); // Display Progress Dialog
+
+        progressDialog.setCancelable(true);
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(250);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                progressDialog.dismiss();
+            }
+        }).start();
+
+//        final SweetAlertDialog pDialog = new SweetAlertDialog(CollectingData.this, SweetAlertDialog.PROGRESS_TYPE);
+//        pDialog.getProgressHelper().setBarColor(Color.parseColor("#D5FDD835"));
+//        pDialog.setTitleText("Saving ...");
+//        pDialog.setCancelable(true);
+//        pDialog.show();
+//        new Thread(new Runnable() {
+//            public void run() {
+//                try {
+//                    Thread.sleep(50);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                pDialog.cancel();
+//            }
+//        });
+
+    }
+
+    void prograseSave(){
+
+        final int[] i = {0};
+        final SweetAlertDialog pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE)
+                .setTitleText("Loading");
+        pDialog.show();
+        pDialog.setCancelable(true);
+        new CountDownTimer(150 * 7, 150) {
+            public void onTick(long millisUntilFinished) {
+                // you can change the progress bar color by ProgressHelper every 800 millis
+                i[0]++;
+                switch (i[0]) {
+                    case 0:
+                        pDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.blue_btn_bg_color));
+                        break;
+                    case 1:
+                        pDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.material_deep_teal_50));
+                        break;
+                    case 2:
+                        pDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.success_stroke_color));
+                        break;
+                    case 3:
+                        pDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.material_deep_teal_20));
+                        break;
+                    case 4:
+                        pDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.material_blue_grey_80));
+                        break;
+                    case 5:
+                        pDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.warning_stroke_color));
+                        break;
+                    case 6:
+                        pDialog.getProgressHelper().setBarColor(getResources().getColor(R.color.success_stroke_color));
+                        break;
+                }
+            }
+
+            public void onFinish() {
+                i[0] = -1;
+                pDialog.setTitleText("Success!")
+                        .setConfirmText("OK")
+                        .changeAlertType(SweetAlertDialog.SUCCESS_TYPE);
+            }
+        }.start();
+
+    }
+
+
+
+
+
+
+
+    void TimeDialog(final TextView itemExpDate) {
+
+        Calendar mcurrentDate = Calendar.getInstance();
+        int mYear = mcurrentDate.get(Calendar.YEAR);
+        int mMonth = mcurrentDate.get(Calendar.MONTH);
+        int mDay = mcurrentDate.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog mDatePicker;
+        mDatePicker = new DatePickerDialog(CollectingData.this, new DatePickerDialog.OnDateSetListener() {
+            public void onDateSet(DatePicker datepicker, int selectedYear, int selectedMonth, int selectedDay) {
+
+                selectedMonth = selectedMonth + 1;
+                itemExpDate.setText(convertToEnglish("" + selectedDay + "/" + selectedMonth + "/" + selectedYear));
+            }
+        }, mYear, mMonth, mDay);
+        mDatePicker.setTitle("Select Date");
+        mDatePicker.show();
+    }
+
+    public String convertToEnglish(String value) {
+        String newValue = (((((((((((value + "").replaceAll("١", "1")).replaceAll("٢", "2")).replaceAll("٣", "3")).replaceAll("٤", "4")).replaceAll("٥", "5")).replaceAll("٦", "6")).replaceAll("٧", "7")).replaceAll("٨", "8")).replaceAll("٩", "9")).replaceAll("٠", "0").replaceAll("٫","."));
+        return newValue;
+    }
+
+    //    void addDialog(final TableLayout recipeTable) {
+//        final Dialog dialogAdd = new Dialog(CollectingData.this);
+//        dialogAdd.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        dialogAdd.setCancelable(false);
+//        dialogAdd.setContentView(R.layout.add_dialog);
+//        dialogAdd.setCanceledOnTouchOutside(false);
+//
+//        Button done, exit, delete;
+//        final EditText message = (EditText) dialogAdd.findViewById(R.id.Message);
+//        done = (Button) dialogAdd.findViewById(R.id.don2Add);
+//        exit = (Button) dialogAdd.findViewById(R.id.exitAdd);
+//
+//        done.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                String messsage = message.getText().toString();
+//
+//                row = new TableRow(CollectingData.this);
+//                TableRow.LayoutParams lp = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT);
+//                row.setLayoutParams(lp);
+//                row.setPadding(0, 5, 0, 20);
+//
+//                final CheckBox textView = new CheckBox(CollectingData.this);
+//                textView.setTextColor(ContextCompat.getColor(CollectingData.this, R.color.textColor));
+//                TableRow.LayoutParams lp2 = new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
+//
+//                textView.setLayoutParams(lp2);
+//                textView.setText(messsage);
+//                row.addView(textView);
+//                recipeTable.addView(row);
+//                //
+//                dialogAdd.dismiss();
+//
+//
+//            }
+//        });
+//        exit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialogAdd.dismiss();
+//            }
+//        });
+//
+//        dialogAdd.show();
+//
+//    }
+
+
+
+    public String findSwitch(String Item){
+
+              String itemOCode= InventDB.getItemSwitch(Item);
+
+        return itemOCode;
+    }
+
+
+    public void readBarCode(TextView itemCodeText, int swBarcode) {
+
+        barCodTextTemp = itemCodeText;
+        Log.e("barcode_099", "in");
+        IntentIntegrator intentIntegrator = new IntentIntegrator(CollectingData.this);
+        intentIntegrator.setDesiredBarcodeFormats(intentIntegrator.ALL_CODE_TYPES);
+        intentIntegrator.setBeepEnabled(false);
+        intentIntegrator.setCameraId(0);
+        intentIntegrator.setPrompt("SCAN");
+        intentIntegrator.setBarcodeImageEnabled(false);
+        intentIntegrator.initiateScan();
+
+        openBarCode = false;
+        switch (swBarcode) {
+            case 0:
+                collDOpen = true;
+                break;
+            case 1:
+                collExOpen = true;
+                break;
+            case 2:
+                collReceipt = true;
+                break;
+            case 3:
+                openSave = true;
+                break;
+        }
+
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        IntentResult Result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (Result != null) {
+            if (Result.getContents() == null) {
+                Log.d("MainActivity", "cancelled scan");
+//                Toast.makeText(this, "cancelled", Toast.LENGTH_SHORT).show();
+                TostMesage(getResources().getString(R.string.cancel));
+            } else {
+                Log.d("MainActivity", "Scanned");
+//                Toast.makeText(this, getString(R.string.scan) + Result.getContents(), Toast.LENGTH_SHORT).show();
+                TostMesage(getResources().getString(R.string.scan)+Result.getContents());
+                barCodTextTemp.setText(Result.getContents() + "");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
+
+
+
+    void initialization() {
+
+        exitAll2 = (Button) findViewById(R.id.exit2);
+        item = (Button) findViewById(R.id.items);
+        setting = (Button) findViewById(R.id.setting);
+        report = (Button) findViewById(R.id.report);
+
+        collectData = (LinearLayout) findViewById(R.id.collData);
+        collectByORG = (LinearLayout) findViewById(R.id.collByorg);
+        transferData = (LinearLayout) findViewById(R.id.transfer);
+        collectingByExpiry = (LinearLayout) findViewById(R.id.collByExp);
+        collectByReceipt = (LinearLayout) findViewById(R.id.collByRecep);
+        home = (TextView) findViewById(R.id.home);
+
+
+        collectByORG.setVisibility(View.GONE);
+        collectingByExpiry.setVisibility(View.GONE);
+        collectByReceipt.setVisibility(View.GONE);
+
+        collectData.setOnClickListener(showDialogOnClick);
+//        collectByORG.setOnClickListener(showDialogOnClick);
+        transferData.setOnClickListener(showDialogOnClick);
+//        collectingByExpiry.setOnClickListener(showDialogOnClick);
+//        collectByReceipt.setOnClickListener(showDialogOnClick);
+
+        Clickable();
+
+    }
+
+    private BoomMenuButton initBmb(int res) {
+        BoomMenuButton bmb = (BoomMenuButton) findViewById(res);
+        assert bmb != null;
+        for (int i = 0; i < bmb.getPiecePlaceEnum().pieceNumber(); i++)
+            bmb.addBuilder(BuilderManager.getSimpleCircleButtonBuilder());
+
+        bmb.setOnBoomListener(new OnBoomListener() {
+            @Override
+            public void onClicked(int index, BoomButton boomButton) {
+
+                switch (index) {
+                    case 0:
+//                        Intent coll = new Intent(CollectingData.this, CollectingData.class);
+//                        startActivity(coll);
+                        break;
+                    case 1:
+                        Intent item = new Intent(CollectingData.this, Item.class);
+                        startActivity(item);
+
+                        break;
+                    case 2:
+                        Intent report = new Intent(CollectingData.this, Report.class);
+                        startActivity(report);
+                        break;
+                    case 3:
+                        Intent tools = new Intent(CollectingData.this, Tools.class);
+                        startActivity(tools);
+                        break;
+                    case 4:
+                        Toast.makeText(CollectingData.this, "index" + index, Toast.LENGTH_SHORT).show();
+
+                        break;
+                    case 5:
+                        alertMessageDialog(CollectingData.this.getResources().getString(R.string.exitfromapp),CollectingData.this.getResources().getString(R.string.exitMessage), 0, "", "");
+                        break;
+
+                }
+
+
+            }
+
+            @Override
+            public void onBackgroundClick() {
+
+            }
+
+            @Override
+            public void onBoomWillHide() {
+
+            }
+
+            @Override
+            public void onBoomDidHide() {
+
+            }
+
+            @Override
+            public void onBoomWillShow() {
+
+            }
+
+            @Override
+            public void onBoomDidShow() {
+
+            }
+        });
+        return bmb;
+    }
+
+
+}

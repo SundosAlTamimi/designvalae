@@ -1,0 +1,584 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/inv2"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bac_"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView19"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:gravity="center"
+            android:text="@string/collecting_data_with_receipt"
+            android:textAllCaps="false"
+            android:textColor="@color/grayLight"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:fontFamily="serif-monospace" />
+
+        <TextView
+            android:id="@+id/textView20"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginBottom="20dp"
+            android:background="@color/orFloor"
+            android:text="TextView" />
+
+        <Button
+            android:id="@+id/barcode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/no_thing"
+            android:text="Barcode By Camera"
+            android:textAllCaps="false" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:orientation="vertical">
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="5dp">
+
+                            <TextView
+                                android:id="@+id/textView30"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/receipt_no"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+
+                            <EditText
+                                android:id="@+id/receirtNo"
+                                android:layout_width="138dp"
+                                android:layout_height="wrap_content"
+                                android:background="@color/freeButton"
+                                android:ems="10"
+                                android:gravity="center"
+                                android:inputType="numberDecimal"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:id="@+id/textView2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/item_code"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+
+                            <EditText
+                                android:id="@+id/itemCodes12"
+                                android:layout_width="138dp"
+                                android:layout_height="wrap_content"
+                                android:background="@color/freeButton"
+                                android:ems="10"
+                                android:focusedByDefault="true"
+                                android:gravity="center"
+                                android:inputType="textPersonName"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+
+                            <CheckBox
+                                android:id="@+id/checkBox3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/extract"
+                                android:textColor="@color/textColor"
+                                android:textSize="14sp" />
+
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="10dp">
+
+                            <TextView
+                                android:id="@+id/textView3"
+                                android:layout_width="98dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/item_name"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/itemName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@color/freeButton"
+                                android:gravity="center"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/textView4"
+                            android:layout_width="98dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/item_qty"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/itemQt"
+                            android:layout_width="138dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginRight="10dp"
+                            android:background="@color/freeButton"
+                            android:ems="10"
+                            android:gravity="center"
+                            android:inputType="numberDecimal"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                    </TableRow>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="horizontal">
+
+                        <TableLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content">
+
+                            <TableRow
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <TextView
+                                    android:id="@+id/textView21"
+                                    android:layout_width="84dp"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/avl_qty"
+                                    android:textColor="@color/textColor"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/avlQty"
+                                    android:layout_width="84dp"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/_0"
+                                    android:textColor="@color/textColor"
+                                    android:textSize="14sp" />
+                            </TableRow>
+
+                            <TableRow
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <TextView
+                                    android:id="@+id/textView23"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/cost_prc"
+                                    android:textColor="@color/textColor"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/costP"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/_0"
+                                    android:textColor="@color/textColor"
+                                    android:textSize="14sp" />
+                            </TableRow>
+
+                            <TableRow
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                                <TextView
+                                    android:id="@+id/textView24"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/sale_prc"
+                                    android:textColor="@color/textColor"
+                                    android:textSize="14sp" />
+
+                                <TextView
+                                    android:id="@+id/saleP"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:text="@string/_0"
+                                    android:textColor="@color/textColor"
+                                    android:textSize="14sp" />
+                            </TableRow>
+
+                            <TableRow
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
+
+                            </TableRow>
+
+                        </TableLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical">
+
+                            <CheckBox
+                                android:id="@+id/checkBox5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="true"
+                                android:text="@string/woc_s"
+                                android:textColor="@color/textColor"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:orientation="vertical">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:id="@+id/textView27"
+                            android:layout_width="82dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/exp_date"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/dateExp"
+                            android:layout_width="141dp"
+                            android:layout_height="wrap_content"
+                            android:background="@color/freeButton"
+                            android:gravity="center"
+
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <CheckBox
+                            android:id="@+id/batchBox"
+                            android:layout_width="83dp"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="@string/batch"
+                            android:textColor="@color/textColor"
+                            android:textSize="14sp" />
+
+                        <EditText
+                            android:id="@+id/batchRecpic"
+                            android:layout_width="142dp"
+                            android:layout_height="wrap_content"
+                            android:background="@color/freeButton"
+                            android:ems="10"
+                            android:gravity="center"
+                            android:inputType="textPersonName"
+                            android:textColor="@color/colorAccent"
+                            android:textSize="16sp" />
+                    </TableRow>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:orientation="vertical">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="3dp">
+
+                        <CheckBox
+                            android:id="@+id/upDateRecip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/update_quantity"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+                    </TableRow>
+
+                    <TableLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp">
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="5dp">
+
+                            <TextView
+                                android:id="@+id/textView9"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/previous_scan"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/textView10"
+                                android:layout_width="88dp"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/textColor"
+                                android:textSize="18sp" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="5dp">
+
+                            <TextView
+                                android:id="@+id/text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/item_code"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/itemCodeBe"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/orFloor"
+                                android:textSize="16sp" />
+                        </TableRow>
+
+                        <TableRow
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_marginBottom="5dp">
+
+                            <TextView
+                                android:id="@+id/textView13"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/item_name"
+                                android:textColor="@color/textColor"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/itemNameBe"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textColor="@color/orFloor"
+                                android:textSize="16sp" />
+                        </TableRow>
+
+                    </TableLayout>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="15dp">
+
+                        <TextView
+                            android:id="@+id/textView14"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/last_qty"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/itemLastBe"
+                            android:layout_width="70dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/orFloor"
+
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/textView16"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="3dp"
+                            android:text="@string/all_qty"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/itemAllBe"
+                            android:layout_width="92dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/orFloor"
+                            android:textSize="18sp" />
+                    </TableRow>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/save"
+                            android:layout_width="131dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/save_buttons"
+                            android:text="@string/save"
+                            android:textAllCaps="false"
+                            android:textColor="@color/textColor"
+                            android:textSize="18sp" />
+
+                        <Button
+                            android:id="@+id/clear"
+                            android:layout_width="131dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/clear_buttons"
+                            android:text="@string/clear"
+                            android:textAllCaps="false"
+                            android:textColor="@color/textColor"
+                            android:textSize="18sp" />
+
+                        <Button
+                            android:id="@+id/updateRec"
+                            android:layout_width="131dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/update_buttons"
+                            android:text="@string/update"
+                            android:textAllCaps="false"
+                            android:textColor="@color/textColor"
+                            android:textSize="18sp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/new1"
+                            android:layout_width="131dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/new_buttons"
+                            android:text="@string/New"
+                            android:textAllCaps="false"
+                            android:textColor="@color/textColor"
+                            android:textSize="18sp" />
+
+                        <Button
+                            android:id="@+id/searchExpRec"
+                            android:layout_width="131dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/search_buttons"
+                            android:text="@string/search"
+                            android:textAllCaps="false"
+                            android:textColor="@color/textColor"
+                            android:textSize="18sp" />
+
+                        <Button
+                            android:id="@+id/exit"
+                            android:layout_width="131dp"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="5dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/exit_buttons"
+                            android:text="@string/exit"
+                            android:textAllCaps="false"
+                            android:textColor="@color/textColor"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,1381 @@
+package com.example.user54.InventoryApp;
+
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.example.user54.InventoryApp.Model.ItemInfo;
+import com.example.user54.InventoryApp.Model.ItemQty;
+import com.example.user54.InventoryApp.Model.ItemSwitch;
+import com.example.user54.InventoryApp.Model.MainSetting;
+import com.example.user54.InventoryApp.Model.Password;
+import com.example.user54.InventoryApp.Model.Stk;
+import com.example.user54.InventoryApp.Model.TblSetting;
+import com.example.user54.InventoryApp.Model.TransferVhfSerial;
+import com.example.user54.InventoryApp.Model.ItemCard;
+import com.example.user54.InventoryApp.Model.ItemInfoExp;
+import com.example.user54.InventoryApp.Model.ItemUnit;
+import com.example.user54.InventoryApp.Model.Order;
+import com.example.user54.InventoryApp.Model.SewooSetting;
+import com.example.user54.InventoryApp.Model.TransferItemsInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class InventoryDatabase extends SQLiteOpenHelper {
+
+    private static final int DATABASE_VERSION = 9;//version Db
+    private static final String DATABASE_Name = "InventoryDBase";//name Db
+
+    static SQLiteDatabase Idb;
+
+    //___________________________________________________________________________________
+    private static final String ITEM_CARD = "ITEM_CARD";
+
+    private static final String ITEM_CODE = "ITEM_CODE";
+    private static final String ITEM_NAME = "ITEM_NAME";
+    private static final String COST_PRC = "COST_PRC";
+    private static final String SALE_PRC = "SALE_PRC";
+    private static final String AVL_QTY = "AVL_QTY";
+    private static final String FD_PRC = "FD_PRC";
+    private static final String BRANCH_ID = "BRANCH_ID";
+    private static final String BRANCH_NAME = "BRANCH_NAME";
+    private static final String DEPARTMENT_ID = "DEPARTMENT_ID";
+    private static final String DEPARTMENT_NAME = "DEPARTMENT_NAME";
+    private static final String ITEM_G = "ITEM_G";
+    private static final String ITEM_K = "ITEM_K";
+    private static final String ITEM_L = "ITEM_L";
+    private static final String ITEM_DIV = "ITEM_DIV";
+    private static final String ITEM_GS = "ITEM_GS";
+    private static final String ORG_PRICE = "ORG_PRICE";
+    private static final String IN_DATE = "IN_DATE";
+
+
+    //________________________________________________________________________________
+
+    private static final String ITEM_INFO_EXP = "ITEM_INFO_EXP";
+
+    private static final String ITEM_CODE1 = "ITEM_CODE";
+    private static final String ITEM_NAME1 = "ITEM_NAME";
+    private static final String ITEM_QTY1 = "ITEM_QTY";
+    private static final String EXP_DATE1 = "EXP_DATE";
+    private static final String BATCH_NO1 = "BATCH_NO";
+    private static final String ROW_INDEX1 = "ROW_INDEX";
+    private static final String AVL_QTY1 = "AVL_QTY";
+    private static final String COST_PRC1 = "COST_PRC";
+    private static final String SALE_PRC1 = "SALE_PRC";
+    private static final String RECEIPT_NO1 = "RECEIPT_NO";
+    private static final String SERIAL_NO1 = "SERIAL_NO";
+
+
+    //________________________________________________________________________________
+
+    private static final String ITEM_INFO_EXP_REC = "ITEM_INFO_EXP_REC";
+
+    private static final String ITEM_CODE2 = "ITEM_CODE";
+    private static final String ITEM_NAME2 = "ITEM_NAME";
+    private static final String ITEM_QTY2 = "ITEM_QTY";
+    private static final String EXP_DATE2 = "EXP_DATE";
+    private static final String BATCH_NO2 = "BATCH_NO";
+    private static final String ROW_INDEX2 = "ROW_INDEX";
+    private static final String AVL_QTY2 = "AVL_QTY";
+    private static final String COST_PRC2 = "COST_PRC";
+    private static final String SALE_PRC2 = "SALE_PRC";
+    private static final String RECEIPT_NO2 = "RECEIPT_NO";
+    private static final String SERIAL_NO2 = "SERIAL_NO";
+
+    //________________________________________________________________________________
+
+    private static final String ITEMS_QTY = "ITEMS_QTY";
+
+    private static final String ITEM_CODE3 = "ITEM_CODE";
+    private static final String ITEM_NAME3 = "ITEM_NAME";
+    private static final String QTY3 = "QTY";
+
+    //________________________________________________________________________________
+
+    private static final String ITEMS_INFO = "ITEMS_INFO";
+
+    private static final String ITEM_CODE4 = "ITEM_CODE";
+    private static final String ITEM_NAME4 = "ITEM_NAME";
+    private static final String ITEM_QTY4 = "ITEM_QTY";
+    private static final String ROW_INDEX4 = "ROW_INDEX";
+    private static final String ITEM_LOC4 = "ITEM_LOC";
+    private static final String SERIAL_NO4 = "SERIAL_NO";
+    private static final String EXPIRY_DATA4 = "EXPIRY_DATA";
+    private static final String SALES_PRICE4 = "SALES_PRICE";
+    private static final String TRN_DATE4 = "TRN_DATE";
+    private static final String IS_EXPORT4 = "IS_EXPORT";
+
+    //________________________________________________________________________________
+
+    private static final String ITEM_SWITCH = "ITEM_SWITCH";
+
+    private static final String ITEM_O_CODE = "ITEM_O_CODE";
+    private static final String ITEM_N_CODE = "ITEM_N_CODE";
+    private static final String ITEM_NAME_A = "ITEM_NAME_A";
+    private static final String ITEM_NAME_E = "ITEM_NAME_E";
+    private static final String IN_DATE4 = "IN_DATE";
+
+    //___________________________________________________________________________________
+    private static final String ITEM_UNITS = "ITEM_UNITS";
+
+    private static final String ITEM_O_CODE5 = "ITEM_O_CODE";
+    private static final String ITEM_BARCODE5 = "ITEM_BARCODE";
+    private static final String SALE_PRICE5 = "SALE_PRICE";
+    private static final String ITEM_U5 = "ITEM_U";
+    private static final String U_QTY5 = "U_QTY";
+    private static final String U_SERIAL5 = "U_SERIAL5";
+    private static final String CALC_QTY5 = "CALC_QTY";
+    private static final String WHOLE_SALE_PRC5 = "WHOLE_SALE_PRC";
+    private static final String PURCHASE_PRICE5 = "PURCHASE_PRICE";
+    private static final String PCLASS1 = "PCLASS1";
+    private static final String PCLASS2 = "PCLASS2";
+    private static final String PCLASS3 = "PCLASS3";
+    private static final String IN_DATE5 = "IN_DATE";
+    private static final String UNIT_NAME5 = "UNIT_NAME";
+
+    //___________________________________________________________________________________
+    private static final String ORDERS = "ORDERS";
+
+    private static final String STK_NO6 = "STK_NO";
+    private static final String LOAD_DATE6 = "LOAD_DATE";
+    private static final String LOAD_QTY6 = "LOAD_QTY";
+    private static final String NET_QTY6 = "NET_QTY";
+    private static final String ITEM_BARCODE6 = "ITEM_BARCODE";
+    private static final String ITEM_CODE6 = "ITEM_CODE";
+
+    //___________________________________________________________________________________
+    private static final String PASSWORD = "PASSWORD";
+
+    private static final String PASSWORD7 = "PASSWORD";
+
+
+    //___________________________________________________________________________________
+    private static final String SEWOO_SETTING = "SEWOO_SETTING";
+
+    private static final String COMPORT = "COMPORT";
+    private static final String BARCODE_X = "BARCODE_X";
+    private static final String BARCODE_Y = "BARCODE_Y";
+    private static final String ITEM_X = "ITEM_X";
+    private static final String ITEM_Y = "ITEM_Y";
+    private static final String ITEM_FONT_TYPE = "ITEM_FONT_TYPE";
+    private static final String ITEM_FONT_SIZE = "ITEM_FONT_SIZE";
+    private static final String PRC_X = "PRC_X";
+    private static final String PRC_Y = "PRC_Y";
+    private static final String PRC_FONT_TYPE = "PRC_FONT_TYPE";
+    private static final String PRC_FONT_SIZE = "PRC_FONT_SIZE";
+    private static final String BARCODE_TYPE = "BARCODE_TYPE";
+    private static final String BARCODE_BN = "BARCODE_BN";
+    private static final String COMP_NAME = "COMP_NAME";
+    private static final String COMP_NM_X = "COMP_NM_X";
+    private static final String COMP_NM_Y = "COMP_NM_Y";
+    private static final String DEV_ID = "DEV_ID";
+
+    //___________________________________________________________________________________
+    private static final String STK = "STK";
+
+    private static final String STK_NO = "STK_NO";
+    private static final String STK_NAME = "STK_NAME";
+
+    //___________________________________________________________________________________
+    private static final String TBL_SETTING = "TBL_SETTING";
+
+    private static final String SETTING_NAME = "SETTING_NAME";
+    private static final String SETTING_INT_VAL = "SETTING_INT_VAL";
+    private static final String SETTING_STR_VAL = "SETTING_STR_VAL";
+
+    //___________________________________________________________________________________
+    private static final String MAIN_SETTING_TABLE = "MAIN_SETTING_TABLE";
+
+    private static final String IP_SETTING = "IP_SETTING";
+    private static final String STORNO = "STORNO";
+
+    //___________________________________________________________________________________
+    private static final String TRANSFER_ITEMS_INFO = "TRANSFER_ITEMS_INFO";
+
+    private static final String ITEM_CODE8 = "ITEM_CODE";
+    private static final String ITEM_NAME8 = "ITEM_NAME";
+    private static final String ITEM_QTY8 = "ITEM_QTY";
+    private static final String FRM_STR8 = "FRM_STR";
+    private static final String TO_STR8 = "TO_STR";
+    private static final String ROW_INDEX8 = "ROW_INDEX";
+    private static final String VHF_NO8 = "VHF_NO";
+    private static final String ISEXPORT8 = "ISEXPORT";
+
+    //___________________________________________________________________________________
+    private static final String TRANSF_VHF_SER = "TRANSF_VHF_SER";
+
+    private static final String VHF_SERIAL = "VHF_SERIAL";
+
+    //_________________________________________________________________________________
+
+
+    public InventoryDatabase(Context context) {
+        super(context, DATABASE_Name, null, DATABASE_VERSION);
+    }
+    //__________________________________________________________________________________
+
+
+    @Override
+    public void onCreate(SQLiteDatabase Idb) {
+
+        String CREATE_TABLE_ITEM_CARD = "CREATE TABLE " + ITEM_CARD + "("
+                + ITEM_CODE + " NVARCHAR NOT NULL,"
+                + ITEM_NAME + " NVARCHAR NOT NULL,"
+                + COST_PRC + " NVARCHAR ,"
+                + SALE_PRC + " NVARCHAR ,"
+                + AVL_QTY + " NVARCHAR ,"
+                + FD_PRC + " NVARCHAR,"
+                + BRANCH_ID + " NVARCHAR,"
+                + BRANCH_NAME + " NVARCHAR,"
+                + DEPARTMENT_ID + " NVARCHAR,"
+                + DEPARTMENT_NAME + " NVARCHAR,"
+                + ITEM_G + " NVARCHAR,"
+                + ITEM_K + " NVARCHAR,"
+                + ITEM_L + " NVARCHAR,"
+                + ITEM_DIV + " NVARCHAR,"
+                + ITEM_GS + " NVARCHAR,"
+                + ORG_PRICE + " NVARCHAR,"
+                + IN_DATE + " NVARCHAR" + ")";
+        Idb.execSQL(CREATE_TABLE_ITEM_CARD);
+
+//=========================================================================================
+
+        String CREATE_TABLE_ITEM_INFO_EXP = "CREATE TABLE " + ITEM_INFO_EXP + "("
+                + ITEM_CODE1 + " NVARCHAR ,"
+                + ITEM_NAME1 + " NVARCHAR ,"
+                + ITEM_QTY1 + " FLOAT ,"
+                + EXP_DATE1 + " NVARCHAR ,"
+                + BATCH_NO1 + " NVARCHAR ,"
+                + ROW_INDEX1 + " FLOAT ,"
+                + AVL_QTY1 + " NVARCHAR ,"
+                + COST_PRC1 + " NVARCHAR ,"
+                + SALE_PRC1 + " NVARCHAR ,"
+                + RECEIPT_NO1 + " NVARCHAR ,"
+                + SERIAL_NO1 + " INTEGER " + ")";
+        Idb.execSQL(CREATE_TABLE_ITEM_INFO_EXP);
+//=========================================================================================
+
+        String CREATE_TABLE_ITEM_INFO_EXP_PREC = "CREATE TABLE " + ITEM_INFO_EXP_REC + "("
+                + ITEM_CODE2 + " NVARCHAR ,"
+                + ITEM_NAME2 + " NVARCHAR ,"
+                + ITEM_QTY2 + " FLOAT ,"
+                + EXP_DATE2 + " NVARCHAR ,"
+                + BATCH_NO2 + " NVARCHAR ,"
+                + ROW_INDEX2 + " FLOAT ,"
+                + AVL_QTY2 + " NVARCHAR ,"
+                + COST_PRC2 + " NVARCHAR ,"
+                + SALE_PRC2 + " NVARCHAR ,"
+                + RECEIPT_NO2 + " NVARCHAR ,"
+                + SERIAL_NO2 + " INTEGER " + ")";
+        Idb.execSQL(CREATE_TABLE_ITEM_INFO_EXP_PREC);
+
+//=========================================================================================
+
+        String CREATE_TABLE_ITEM_QTY = "CREATE TABLE " + ITEMS_QTY + "("
+                + ITEM_CODE3 + " NVARCHAR ,"
+                + ITEM_NAME3 + " NVARCHAR ,"
+                + QTY3 + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_ITEM_QTY);
+
+//=========================================================================================
+
+        String CREATE_TABLE_ITEMS_INFO = "CREATE TABLE " + ITEMS_INFO + "("
+                + ITEM_CODE4 + " NVARCHAR ,"
+                + ITEM_NAME4 + " NVARCHAR ,"
+                + ITEM_QTY4 +  " NVARCHAR ,"
+                + ROW_INDEX4 + " NVARCHAR ,"
+                + ITEM_LOC4 + " NVARCHAR ,"
+                + SERIAL_NO4 + " INTEGER ,"
+                + EXPIRY_DATA4 + " NVARCHAR ,"
+                + SALES_PRICE4 + " NVARCHAR ,"
+                + TRN_DATE4 + " NVARCHAR ,"
+                + IS_EXPORT4 +  " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_ITEMS_INFO);
+
+//=========================================================================================
+
+        String CREATE_TABLE_ITEMS_SWITCH = "CREATE TABLE " + ITEM_SWITCH + "("
+                + ITEM_O_CODE + " NVARCHAR NOT NULL ,"
+                + ITEM_N_CODE + " NVARCHAR NOT NULL,"
+                + ITEM_NAME_A + " NVARCHAR ,"
+                + ITEM_NAME_E + " NVARCHAR ,"
+                + IN_DATE4 + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_ITEMS_SWITCH);
+//=========================================================================================
+
+        String CREATE_TABLE_ITEMS_UNITS = "CREATE TABLE " + ITEM_UNITS + "("
+                + ITEM_O_CODE5 + " NVARCHAR  ,"
+                + ITEM_BARCODE5 + " NVARCHAR ,"
+                + SALE_PRICE5 + " FLOAT ,"
+                + ITEM_U5 + " NVARCHAR ,"
+                + U_QTY5 + " INT ,"
+                + U_SERIAL5 + " INT ,"
+                + CALC_QTY5 + " INT ,"
+                + WHOLE_SALE_PRC5 + " FLOAT ,"
+                + PURCHASE_PRICE5 + " FLOAT ,"
+                + PCLASS1 + " FLOAT ,"
+                + PCLASS2 + " FLOAT ,"
+                + PCLASS3 + " FLOAT ,"
+                + IN_DATE5 + " NVARCHAR ,"
+                + UNIT_NAME5 + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_ITEMS_UNITS);
+
+//=========================================================================================
+
+        String CREATE_TABLE_ORDERS = "CREATE TABLE " + ORDERS + "("
+                + STK_NO6 + " INT  ,"
+                + LOAD_DATE6 + " NVARCHAR ,"
+                + LOAD_QTY6 + " FLOAT DEFAULT (0) ,"
+                + NET_QTY6 + " FLOAT DEFAULT (0) ,"
+                + ITEM_BARCODE6 + " NVARCHAR ,"
+                + ITEM_CODE6 + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_ORDERS);
+
+//=========================================================================================
+
+        String CREATE_TABLE_PASSWORD = "CREATE TABLE " + PASSWORD + "("
+                + PASSWORD7 + " NVARCHAR NOT NULL " + ")";
+        Idb.execSQL(CREATE_TABLE_PASSWORD);
+
+//=========================================================================================
+
+        String CREATE_TABLE_SEWOO_SETING = "CREATE TABLE " + SEWOO_SETTING + "("
+                + COMPORT + " NVARCHAR NOT NULL  ,"
+                + BARCODE_X + " INT NOT NULL ,"
+                + BARCODE_Y + " INT NOT NULL ,"
+                + ITEM_X + " INT NOT NULL ,"
+                + ITEM_Y + " INT NOT NULL ,"
+                + ITEM_FONT_TYPE + " INT NOT NULL ,"
+                + ITEM_FONT_SIZE + " INT NOT NULL ,"
+                + PRC_X + " INT NOT NULL ,"
+                + PRC_Y + " INT NOT NULL ,"
+                + PRC_FONT_TYPE + " INT NOT NULL ,"
+                + PRC_FONT_SIZE + " INT NOT NULL ,"
+                + BARCODE_TYPE + " INT ,"
+                + BARCODE_BN + " INT ,"
+                + COMP_NAME + " NVARCHAR ,"
+                + COMP_NM_X + " NVARCHAR ,"
+                + COMP_NM_Y + " NVARCHAR ,"
+                + DEV_ID + " NVARCHAR  DEFAULT (1)" + ")";
+        Idb.execSQL(CREATE_TABLE_SEWOO_SETING);
+
+//=========================================================================================
+        String CREATE_TABLE_STK = "CREATE TABLE " + STK + "("
+                + STK_NO + " NVARCHAR   ,"
+                + STK_NAME + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_STK);
+
+//=========================================================================================
+        String CREATE_TABLE_TBL_SETTING = "CREATE TABLE " + TBL_SETTING + "("
+                + SETTING_NAME + " NVARCHAR   ,"
+                + SETTING_INT_VAL + " INT DEFAULT (0)  ,"
+                + SETTING_STR_VAL + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_TBL_SETTING);
+
+//=========================================================================================
+        String CREATE_TABLE_MAIN_SETTING = "CREATE TABLE " + MAIN_SETTING_TABLE + "("
+                + IP_SETTING + " NVARCHAR   ,"
+                + STORNO + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_MAIN_SETTING);
+
+//=========================================================================================
+        String CREATE_TABLE_TRANSFER_ITEM_INFO = "CREATE TABLE " + TRANSFER_ITEMS_INFO + "("
+                + ITEM_CODE8 + " NVARCHAR   ,"
+                + ITEM_NAME8 + " NVARCHAR   ,"
+                + ITEM_QTY8 + " FLOAT   ,"
+                + FRM_STR8 + " NVARCHAR ,"
+                + TO_STR8 + " NVARCHAR ,"
+                + ROW_INDEX8 + " FLOAT   ,"
+                + VHF_NO8 + " INT NOT NULL   ,"
+                + ISEXPORT8 + " NVARCHAR " + ")";
+        Idb.execSQL(CREATE_TABLE_TRANSFER_ITEM_INFO);
+
+//=========================================================================================
+        String CREATE_TABLE_TRANSF_VHF_SERIAL = "CREATE TABLE " + TRANSF_VHF_SER + "("
+                + VHF_SERIAL + " INT NOT NULL " + ")";
+        Idb.execSQL(CREATE_TABLE_TRANSF_VHF_SERIAL);
+
+//=========================================================================================
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase Idb, int oldVersion, int newVersion) {
+
+        try {
+            Idb.execSQL("ALTER TABLE ITEMS_INFO ADD " + TRN_DATE4 + " TEXT");
+        }catch (Exception e){
+            Log.e("upgrade", "ITEMS_INFO TRN_DATE4");
+        }
+        try {
+            Idb.execSQL("ALTER TABLE ITEM_CARD ADD " + IN_DATE + " TEXT " +" DEFAULT '05/03/2020'");
+        }catch (Exception e){
+            Log.e("upgrade", "ITEMS_INFO TRN_DATE4");
+        }
+
+        try {
+            Idb.execSQL("ALTER TABLE ITEM_SWITCH ADD " + IN_DATE4 + " TEXT "+" DEFAULT '05/03/2020'");
+        }catch (Exception e){
+            Log.e("upgrade", "ITEMS_INFO TRN_DATE4");
+        }
+
+        try {
+            Idb.execSQL("ALTER TABLE ITEMS_INFO ADD " + IS_EXPORT4 + " TEXT");
+        }catch (Exception e){
+            Log.e("upgrade", "ITEMS_INFO IS_EXPORT4");
+        }
+
+        try {
+            Idb.execSQL("ALTER TABLE TRANSFER_ITEMS_INFO ADD " + ISEXPORT8 + " TEXT");
+        }catch (Exception e){
+            Log.e("upgrade", "TRANSFER_ITEMS_INFO IS_EXPORT8");
+        }
+
+
+    }
+
+
+    public void addItemcard(ItemInfo itemInfo) {
+        Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(ITEM_CODE4, convertToEnglish(itemInfo.getItemCode()));
+        values.put(ITEM_NAME4, itemInfo.getItemName());
+        values.put(ITEM_QTY4,convertToEnglish(""+itemInfo.getItemQty()));
+        values.put(ROW_INDEX4, itemInfo.getRowIndex());
+        values.put(ITEM_LOC4, itemInfo.getItemLocation());
+        values.put(SERIAL_NO4, itemInfo.getSerialNo());
+        values.put(EXPIRY_DATA4,  convertToEnglish(itemInfo.getExpDate()));
+        values.put(SALES_PRICE4,  convertToEnglish(""+itemInfo.getSalePrice()));
+        values.put(TRN_DATE4,  convertToEnglish(itemInfo.getTrnDate()));
+        values.put(IS_EXPORT4, itemInfo.getIsExport());
+
+        Idb.insert(ITEMS_INFO, null, values);
+        Idb.close();
+    }
+
+    public void addVhf(TransferVhfSerial itemInfo) {
+        Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(VHF_SERIAL, convertToEnglish( ""+itemInfo.getVhfSerial()));
+
+
+        Idb.insert(TRANSF_VHF_SER, null, values);
+        Idb.close();
+    }
+
+    public void addItemTransferInfo(TransferItemsInfo itemInfo) {
+        Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+
+        values.put(ITEM_CODE8, itemInfo.getItemCode());
+        values.put(ITEM_NAME8, itemInfo.getItemName());
+        values.put(ITEM_QTY8,  convertToEnglish(""+itemInfo.getItemQty()));
+        values.put(FRM_STR8,  convertToEnglish(itemInfo.getFromStr()));
+        values.put(TO_STR8,  convertToEnglish(itemInfo.getToStr()));
+        values.put(ROW_INDEX8,  convertToEnglish(""+itemInfo.getRowIndex()));
+        values.put(VHF_NO8,  convertToEnglish(""+itemInfo.getVhfNo()));
+        values.put(ISEXPORT8, itemInfo.getIsExport());
+
+
+
+        Idb.insert(TRANSFER_ITEMS_INFO, null, values);
+        Idb.close();
+    }
+
+
+    public void addAllMainSetting(MainSetting mainSetting) {
+        Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(IP_SETTING, convertToEnglish( mainSetting.getIP()));
+        values.put(STORNO,  convertToEnglish(mainSetting.getStorNo()));
+
+        Idb.insert(MAIN_SETTING_TABLE, null, values);
+        Idb.close();
+    }
+
+
+    public void addItemcardTable(ItemCard itemInfo) {
+        SQLiteDatabase Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(ITEM_CODE, itemInfo.getItemCode());
+        values.put(ITEM_NAME, itemInfo.getItemName());
+        values.put(COST_PRC, itemInfo.getCostPrc());
+        values.put(SALE_PRC, convertToEnglish( itemInfo.getSalePrc()));
+        values.put(AVL_QTY,  convertToEnglish(itemInfo.getAVLQty()));
+        values.put(FD_PRC,  convertToEnglish(itemInfo.getFDPRC()));
+        values.put(BRANCH_ID,  convertToEnglish(itemInfo.getBranchId()));
+        values.put(BRANCH_NAME, itemInfo.getBranchName());
+        values.put(DEPARTMENT_ID, itemInfo.getDepartmentId());
+        values.put(DEPARTMENT_NAME, itemInfo.getDepartmentName());
+        values.put(ITEM_G, itemInfo.getItemG());
+        values.put(ITEM_K, itemInfo.getItemK());
+        values.put(ITEM_L, itemInfo.getItemL());
+        values.put(ITEM_DIV, itemInfo.getItemDiv());
+        values.put(ITEM_GS, itemInfo.getItemGs());
+        values.put(ORG_PRICE,  convertToEnglish(itemInfo.getOrgPrice()));
+        values.put(IN_DATE,  itemInfo.getInDate());
+
+        Idb.insert(ITEM_CARD, null, values);
+        Idb.close();
+    }
+//    public void addItemcardTableTest(List<ItemCard> itemInfo) {
+//        SQLiteDatabase Idb = this.getReadableDatabase();
+//        Idb.beginTransaction();
+//        ContentValues  values []= new ContentValues[itemInfo.size()];
+//        for(int i=0;i<itemInfo.size();i+=10) {
+//
+//           String q= " INSERT INTO ITEM_CARD VALUES("+itemInfo.get(i).getItemCode()+","+ '123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555'),"
+//                    +" ('123555555', '123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555'),"
+//                    +" ('123555555', '123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555','123555555');";
+//
+//
+//            Idb.execSQL(q);
+//        }
+//
+//
+//        Idb.close();
+//    }
+
+    public void addItemcardTableTester(List<ItemCard> itemInfo) {
+
+        SQLiteDatabase Idb = this.getReadableDatabase();
+        Idb.beginTransaction();
+        for (int i = 0; i < itemInfo.size(); i++) {
+            ContentValues values = new ContentValues();
+            values.put(ITEM_CODE, itemInfo.get(i).getItemCode());
+            values.put(ITEM_NAME, itemInfo.get(i).getItemName());
+            values.put(COST_PRC, itemInfo.get(i).getCostPrc());
+            values.put(SALE_PRC, convertToEnglish( itemInfo.get(i).getSalePrc()));
+            values.put(AVL_QTY,  convertToEnglish(itemInfo.get(i).getAVLQty()));
+            values.put(FD_PRC,  convertToEnglish(itemInfo.get(i).getFDPRC()));
+            values.put(BRANCH_ID,  convertToEnglish(itemInfo.get(i).getBranchId()));
+            values.put(BRANCH_NAME, itemInfo.get(i).getBranchName());
+            values.put(DEPARTMENT_ID, itemInfo.get(i).getDepartmentId());
+            values.put(DEPARTMENT_NAME, itemInfo.get(i).getDepartmentName());
+            values.put(ITEM_G, itemInfo.get(i).getItemG());
+            values.put(ITEM_K, itemInfo.get(i).getItemK());
+            values.put(ITEM_L, itemInfo.get(i).getItemL());
+            values.put(ITEM_DIV, itemInfo.get(i).getItemDiv());
+            values.put(ITEM_GS, itemInfo.get(i).getItemGs());
+            values.put(ORG_PRICE,  convertToEnglish(itemInfo.get(i).getOrgPrice()));
+            values.put(IN_DATE,  itemInfo.get(i).getInDate());
+//            Idb.insert(ITEM_CARD, null, values);
+            Idb.insertWithOnConflict(ITEM_CARD, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+
+        }
+
+        Idb.setTransactionSuccessful();
+        Idb.endTransaction();
+//        Idb.close();
+    }
+
+
+
+
+    public void addStory(Stk Stk) {
+        SQLiteDatabase Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(STK_NAME, Stk.getStkName());
+        values.put(STK_NO,  convertToEnglish(Stk.getStkNo()));
+
+        Idb.insert(STK, null, values);
+        Idb.close();
+    }
+
+    public void addItemSwitch(ItemSwitch itemSwitch) {
+        SQLiteDatabase Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(ITEM_O_CODE, itemSwitch.getItemOCode());
+        values.put(ITEM_N_CODE, itemSwitch.getItemNCode());
+        values.put(ITEM_NAME_A, itemSwitch.getItemNameA());
+        values.put(ITEM_NAME_E, itemSwitch.getItemNameE());
+        values.put(IN_DATE4, itemSwitch.getInDate());
+
+
+        Idb.insert(ITEM_SWITCH, null, values);
+        Idb.close();
+    }
+
+
+
+
+    public void addItemSwitchTester(List<ItemSwitch> itemSwitch) {
+
+        SQLiteDatabase Idb = this.getReadableDatabase();
+        Idb.beginTransaction();
+
+        for (int i = 0; i < itemSwitch.size(); i++) {
+            ContentValues values = new ContentValues();
+
+            values.put(ITEM_O_CODE, itemSwitch.get(i).getItemOCode());
+            values.put(ITEM_N_CODE, itemSwitch.get(i).getItemNCode());
+            values.put(ITEM_NAME_A, itemSwitch.get(i).getItemNameA());
+            values.put(ITEM_NAME_E, itemSwitch.get(i).getItemNameE());
+            values.put(IN_DATE4, itemSwitch.get(i).getInDate());
+
+
+//            Idb.insert(ITEM_SWITCH, null, values);
+            Idb.insertWithOnConflict(ITEM_SWITCH, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+        Idb.setTransactionSuccessful();
+        Idb.endTransaction();
+
+    }
+
+
+    public void addItemInfoExp(ItemInfoExp itemInfoExp) {
+        Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(ITEM_CODE1, itemInfoExp.getItemCode());
+        values.put(ITEM_NAME1, itemInfoExp.getItemName());
+        values.put(ITEM_QTY1,  convertToEnglish(""+itemInfoExp.getItemQty()));
+        values.put(EXP_DATE1,  convertToEnglish(itemInfoExp.getExpDate()));
+        values.put(BATCH_NO1, itemInfoExp.getBatchNo());
+        values.put(ROW_INDEX1, itemInfoExp.getRowIndex());
+        values.put(AVL_QTY1, itemInfoExp.getAVLQTY());
+        values.put(COST_PRC1, itemInfoExp.getCostPrc());
+        values.put(SALE_PRC1, itemInfoExp.getSalePrc());
+        values.put(RECEIPT_NO1, itemInfoExp.getReceiptNo());
+        values.put(SERIAL_NO1, itemInfoExp.getSerialNo());
+
+        Idb.insert(ITEM_INFO_EXP, null, values);
+        Idb.close();
+    }
+    public void addItemInfoReceipt(ItemInfoExp itemInfo) {
+        Idb = this.getReadableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(ITEM_CODE2, itemInfo.getItemCode());
+        values.put(ITEM_NAME2, itemInfo.getItemName());
+        values.put(ITEM_QTY2, itemInfo.getItemQty());
+        values.put(EXP_DATE2, itemInfo.getExpDate());
+        values.put(BATCH_NO2, itemInfo.getBatchNo());
+        values.put(ROW_INDEX2, itemInfo.getRowIndex());
+        values.put(AVL_QTY2, itemInfo.getAVLQTY());
+        values.put(COST_PRC2, itemInfo.getCostPrc());
+        values.put(SALE_PRC2, itemInfo.getSalePrc());
+        values.put(RECEIPT_NO2, itemInfo.getReceiptNo());
+        values.put(SERIAL_NO2, itemInfo.getSerialNo());
+
+        Idb.insert(ITEM_INFO_EXP_REC, null, values);
+        Idb.close();
+    }
+
+
+
+
+    public ArrayList<ItemInfo> getAllItemInfo() {
+        ArrayList<ItemInfo> itemInfos = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ITEMS_INFO;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemInfo item = new ItemInfo();
+
+                item.setItemCode(cursor.getString(0));
+                item.setItemName(cursor.getString(1));
+                item.setItemQty(cursor.getFloat(2));
+                item.setRowIndex(cursor.getFloat(3));
+                item.setItemLocation(cursor.getString(4));
+                item.setSerialNo(cursor.getInt(5));
+                item.setExpDate(cursor.getString(6));
+                item.setSalePrice(cursor.getFloat(7));
+                item.setTrnDate(cursor.getString(8));
+                item.setIsExport(cursor.getString(9));
+
+                itemInfos.add(item);
+            } while (cursor.moveToNext());
+        }
+        return itemInfos;
+    }
+
+
+
+    public ArrayList<ItemInfo> getAllItemInfoSum() {
+        ArrayList<ItemInfo> itemInfos = new ArrayList<>();
+
+        String selectQuery = "SELECT ITEM_CODE, ITEM_NAME , SALES_PRICE , SUM(ITEM_QTY) ITEM_QTY FROM  ITEMS_INFO GROUP BY   ITEM_CODE ";
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemInfo item = new ItemInfo();
+
+                item.setItemCode(cursor.getString(0));
+                item.setItemName(cursor.getString(1));
+                item.setSalePrice(cursor.getInt(2));
+                item.setItemQty(cursor.getFloat(3));
+
+
+                itemInfos.add(item);
+            } while (cursor.moveToNext());
+        }
+        return itemInfos;
+    }
+
+
+    public ArrayList<ItemCard> getAllItemCard() {
+        ArrayList<ItemCard> itemCards = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ITEM_CARD;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemCard item = new ItemCard();
+
+                item.setItemCode(cursor.getString(0));
+                item.setItemName(cursor.getString(1));
+                item.setCostPrc(cursor.getString(2));
+                item.setSalePrc(cursor.getString(3));
+                item.setAVLQty(cursor.getString(4));
+                item.setFDPRC(cursor.getString(5));
+                item.setBranchId(cursor.getString(6));
+                item.setBranchName(cursor.getString(7));
+                item.setDepartmentId(cursor.getString(8));
+                item.setDepartmentName(cursor.getString(9));
+                item.setItemG(cursor.getString(10));
+                item.setItemK(cursor.getString(11));
+                item.setItemL(cursor.getString(12));
+                item.setItemDiv(cursor.getString(13));
+                item.setItemGs(cursor.getString(14));
+                item.setOrgPrice(cursor.getString(15));
+                item.setInDate(cursor.getString(16));
+
+                itemCards.add(item);
+            } while (cursor.moveToNext());
+        }
+        return itemCards;
+    }
+
+    public ItemCard getItemCardByBarCode(String ITEM_CODE) {
+       ItemCard itemCards = new ItemCard();
+
+        String selectQuery = "SELECT  * FROM " + ITEM_CARD+ " where ITEM_CODE = '"+ITEM_CODE+"'";
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                itemCards.setItemCode(cursor.getString(0));
+                itemCards.setItemName(cursor.getString(1));
+                itemCards.setCostPrc(cursor.getString(2));
+                itemCards.setSalePrc(cursor.getString(3));
+                itemCards.setAVLQty(cursor.getString(4));
+                itemCards.setFDPRC(cursor.getString(5));
+                itemCards.setBranchId(cursor.getString(6));
+                itemCards.setBranchName(cursor.getString(7));
+                itemCards.setDepartmentId(cursor.getString(8));
+                itemCards.setDepartmentName(cursor.getString(9));
+                itemCards.setItemG(cursor.getString(10));
+                itemCards.setItemK(cursor.getString(11));
+                itemCards.setItemL(cursor.getString(12));
+                itemCards.setItemDiv(cursor.getString(13));
+                itemCards.setItemGs(cursor.getString(14));
+                itemCards.setOrgPrice(cursor.getString(15));
+
+
+            } while (cursor.moveToNext());
+        }
+        return itemCards;
+    }
+
+
+    public ArrayList<ItemInfoExp> getAllItemInfoExp() {
+        ArrayList<ItemInfoExp> itemInfoExps = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ITEM_INFO_EXP;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemInfoExp item = new ItemInfoExp();
+
+                item.setItemCode(cursor.getString(0));
+                item.setItemName(cursor.getString(1));
+                item.setItemQty(cursor.getFloat(2));
+                item.setExpDate(cursor.getString(3));
+                item.setBatchNo(cursor.getString(4));
+                item.setRowIndex(cursor.getFloat(5));
+                item.setAVLQTY(cursor.getString(6));
+                item.setCostPrc(cursor.getString(7));
+                item.setSalePrc(cursor.getString(8));
+                item.setReceiptNo(cursor.getString(9));
+                item.setSerialNo(cursor.getInt(10));
+
+
+                itemInfoExps.add(item);
+            } while (cursor.moveToNext());
+        }
+        return itemInfoExps;
+    }
+
+
+    public ArrayList<ItemInfoExp> getAllItemInfoExpRec() {
+        ArrayList<ItemInfoExp> itemInfoExpRec = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ITEM_INFO_EXP_REC;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemInfoExp item = new ItemInfoExp();
+
+                item.setItemCode(cursor.getString(0));
+                item.setItemName(cursor.getString(1));
+                item.setItemQty(cursor.getFloat(2));
+                item.setExpDate(cursor.getString(3));
+                item.setBatchNo(cursor.getString(4));
+                item.setRowIndex(cursor.getFloat(5));
+                item.setAVLQTY(cursor.getString(6));
+                item.setCostPrc(cursor.getString(7));
+                item.setSalePrc(cursor.getString(8));
+                item.setReceiptNo(cursor.getString(9));
+                item.setSerialNo(cursor.getInt(10));
+
+                itemInfoExpRec.add(item);
+            } while (cursor.moveToNext());
+        }
+        return itemInfoExpRec;
+    }
+
+
+    public ArrayList<ItemQty> getAllItemQty() {
+        ArrayList<ItemQty> itemQty = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ITEMS_QTY;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemQty item = new ItemQty();
+
+                item.setItemCode(cursor.getString(0));
+                item.setItemName(cursor.getString(1));
+                item.setQty(cursor.getString(2));
+
+                itemQty.add(item);
+            } while (cursor.moveToNext());
+        }
+        return itemQty;
+    }
+
+    public ArrayList<ItemSwitch> getAllItemSwitch() {
+        ArrayList<ItemSwitch> itemSwitch = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ITEM_SWITCH;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemSwitch item = new ItemSwitch();
+
+                item.setItemOCode(cursor.getString(0));
+                item.setItemNCode(cursor.getString(1));
+                item.setItemNameA(cursor.getString(2));
+                item.setItemNameE(cursor.getString(3));
+                item.setInDate(cursor.getString(4));
+
+                itemSwitch.add(item);
+            } while (cursor.moveToNext());
+        }
+        return itemSwitch;
+    }
+
+    public String getItemSwitch(String ITEM_N_CODEs) {
+       String itemSwitch = "";
+
+        String selectQuery = "SELECT ITEM_O_CODE FROM " + ITEM_SWITCH +" where ITEM_N_CODE = '"+ITEM_N_CODEs+"'";
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+//            do {
+
+
+                itemSwitch=cursor.getString(0);
+
+
+
+//            } while (cursor.moveToNext());
+        }
+        return itemSwitch;
+    }
+
+    public ArrayList<ItemUnit> getAllItemUnit() {
+        ArrayList<ItemUnit> itemUnit = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ITEM_UNITS;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                ItemUnit item = new ItemUnit();
+
+                item.setItemOCode(cursor.getString(0));
+                item.setItemBarcode(cursor.getString(1));
+                item.setSalePrice(cursor.getFloat(2));
+                item.setItemU(cursor.getString(3));
+                item.setUQty(cursor.getInt(4));
+                item.setUSerial(cursor.getInt(5));
+                item.setCalcQty(cursor.getInt(6));
+                item.setWholeSalePrc(cursor.getFloat(7));
+                item.setPurchasePrc(cursor.getFloat(8));
+                item.setPclAss1(cursor.getFloat(9));
+                item.setPclAss2(cursor.getFloat(10));
+                item.setPclAss3(cursor.getFloat(11));
+                item.setInDate(cursor.getString(12));
+                item.setUnitName(cursor.getString(13));
+
+                itemUnit.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return itemUnit;
+    }
+
+
+    public ArrayList<Order> getAllOrder() {
+        ArrayList<Order> orders = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + ORDERS;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Order item = new Order();
+
+                item.setStockNo(cursor.getInt(0));
+                item.setLoadDate(cursor.getString(1));
+                item.setLoadQty(cursor.getFloat(2));
+                item.setNetQty(cursor.getFloat(3));
+                item.setItemBarcode(cursor.getString(4));
+                item.setItemCode(cursor.getString(5));
+
+                orders.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return orders;
+    }
+
+
+    public ArrayList<Password> getAllPassword() {
+        ArrayList<Password> passwords = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + PASSWORD;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Password item = new Password();
+
+                item.setPasswords(cursor.getString(0));
+
+                passwords.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return passwords;
+    }
+
+    public ArrayList<MainSetting> getAllMainSetting() {
+        ArrayList<MainSetting> passwords = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + MAIN_SETTING_TABLE;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                MainSetting item = new MainSetting();
+
+                item.setIP(cursor.getString(0));
+                item.setStorNo(cursor.getString(1));
+                passwords.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return passwords;
+    }
+
+    public ArrayList<SewooSetting> getAllSewooSetting() {
+        ArrayList<SewooSetting> sewooSettings = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + SEWOO_SETTING;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                SewooSetting item = new SewooSetting();
+
+                item.setComPort(cursor.getString(0));
+                item.setBarcodeX(cursor.getInt(1));
+                item.setBarcodeY(cursor.getInt(2));
+                item.setItemX(cursor.getInt(3));
+                item.setItemY(cursor.getInt(4));
+                item.setItemFontType(cursor.getInt(5));
+
+                item.setItemFontSize(cursor.getInt(6));
+                item.setPrcX(cursor.getInt(7));
+                item.setPrcY(cursor.getInt(8));
+                item.setPrcFontType(cursor.getInt(9));
+                item.setPrcFontSize(cursor.getInt(10));
+                item.setBarcodeType(cursor.getInt(11));
+
+                item.setBarcodeBn(cursor.getInt(12));
+                item.setCompName(cursor.getString(13));
+                item.setCompNMX(cursor.getString(14));
+                item.setCompNMY(cursor.getString(15));
+                item.setDevID(cursor.getString(16));
+
+                sewooSettings.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return sewooSettings;
+    }
+
+
+    public ArrayList<Stk> getAllStk() {
+        ArrayList<Stk> stks = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + STK;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Stk item = new Stk();
+
+                item.setStkNo(cursor.getString(0));
+                item.setStkName(cursor.getString(1));
+
+                stks.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return stks;
+    }
+
+
+
+    public String getVhf() {
+
+        String vhf="";
+        String selectQuery = " SELECT VHF_SERIAL FROM " + TRANSF_VHF_SER;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                vhf=  cursor.getString(0);
+
+
+
+            } while (cursor.moveToNext());
+        }
+        return vhf;
+    }
+
+    public String getStkName(String STORNo) {
+
+        String stkName="";
+        String selectQuery = "SELECT  STK_NAME FROM " + STK +" where STK_NO = "+STORNo;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                stkName= cursor.getString(0);
+
+
+
+            } while (cursor.moveToNext());
+        }
+        return stkName;
+    }
+
+
+    public ArrayList<TblSetting> getAllTblSetting() {
+        ArrayList<TblSetting> tblSetting = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + TBL_SETTING;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                TblSetting item = new TblSetting();
+
+                item.setSettingName(cursor.getString(0));
+                item.setSettingIntVal(cursor.getInt(1));
+                item.setSettingStrVal(cursor.getString(2));
+
+                tblSetting.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return tblSetting;
+    }
+
+
+    public ArrayList<TransferItemsInfo> getAllTransferItemInfo() {
+        ArrayList<TransferItemsInfo> transferItems = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + TRANSFER_ITEMS_INFO;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                TransferItemsInfo item = new TransferItemsInfo();
+
+                item.setItemCode(cursor.getString(0));
+                item.setItemName(cursor.getString(1));
+                item.setItemQty(cursor.getFloat(2));
+                item.setFromStr(cursor.getString(3));
+                item.setToStr(cursor.getString(4));
+                item.setRowIndex(cursor.getFloat(5));
+                item.setVhfNo(cursor.getInt(6));
+                item.setIsExport(cursor.getString(7));
+
+                transferItems.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return transferItems;
+    }
+
+    public ArrayList<TransferVhfSerial> getAllTransferVhfSer() {
+        ArrayList<TransferVhfSerial> transferItems = new ArrayList<>();
+
+        String selectQuery = "SELECT  * FROM " + TRANSF_VHF_SER;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                TransferVhfSerial item = new TransferVhfSerial();
+
+                item.setVhfSerial(cursor.getInt(0));
+
+                transferItems.add(item);
+
+            } while (cursor.moveToNext());
+        }
+        return transferItems;
+    }
+
+    public String getTotal(String ItemCode,String TableName)
+    {
+
+        String Total = "0";//NVL(SUM(Price), 0)
+        String selectQuery="SELECT COALESCE(sum(ITEM_QTY),0)  FROM  " +TableName +" WHERE ITEM_CODE = '" + ItemCode + "'";
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Total = cursor.getString(0);
+
+            }while (cursor.moveToNext());
+            Log.e("Total ..","...."+Total);
+        }
+
+
+        return Total;
+    }
+
+
+
+    public void updateExpTable(String TableName ,String newValue,String serialNo,String itemCode) {
+        Idb = this.getWritableDatabase();
+String filter=SERIAL_NO4 + " = '" + serialNo + "' and " + ITEM_CODE4 + " = '" + itemCode + "'";
+        ContentValues args = new ContentValues();
+        args.put(ITEM_QTY4, newValue);
+
+        Idb.update(TableName, args, filter, null);
+
+
+    }
+
+
+    public void updateTransferTable(String TableName ,String newValue,String serialNo,String itemCode) {
+        Idb = this.getWritableDatabase();
+        String filter=ROW_INDEX8 + " = '" + serialNo + "' and " + ITEM_CODE8 + " = '" + itemCode + "'";
+        ContentValues args = new ContentValues();
+        args.put(ITEM_QTY8, newValue);
+
+        Idb.update(TableName, args, filter, null);
+
+
+    }
+
+    public int  getMax(){
+        int maxNo=0;
+        //select IFNULL(Max(VHF_NO),0)  FROM TRANSFER_ITEMS_INFO
+
+        String selectQuery = "select IFNULL(Max(VHF_NO),1)  FROM TRANSFER_ITEMS_INFO";
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                maxNo=cursor.getInt(0);
+
+
+            } while (cursor.moveToNext());
+        }
+        return maxNo;
+
+    }
+
+    public String  getMaxInDate(String tableName){
+        String maxNo="";
+        //select IFNULL(Max(VHF_NO),0)  FROM TRANSFER_ITEMS_INFO
+
+//        String selectQuery = "select IFNULL(Max(IN_DATE),-1)  FROM  "+tableName;
+        String selectQuery = "SELECT IFNULL (MAX(datetime(substr(IN_DATE, 7, 4) || '-' || substr(IN_DATE, 4, 2) || '-' || substr(IN_DATE, 1, 2))),'2020-03-05') FROM "+tableName;
+        Idb = this.getWritableDatabase();
+        Cursor cursor = Idb.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+
+                maxNo=cursor.getString(0);
+
+
+            } while (cursor.moveToNext());
+        }
+        return maxNo;
+
+    }
+
+    public void updatePasswordTable(String newValue,String serialNo,String oldPass) {
+        Idb = this.getWritableDatabase();
+        //SERIAL_NO4 + " = '" + serialNo + "' and " +
+        String filter= PASSWORD7 + " = '" + oldPass + "'";
+        ContentValues args = new ContentValues();
+        args.put(PASSWORD7, newValue);
+
+        Idb.update(PASSWORD, args, filter, null);
+
+
+    }
+
+
+    public void updateVhfNo(String newValue) {
+        Idb = this.getWritableDatabase();
+        //SERIAL_NO4 + " = '" + serialNo + "' and " +
+
+        ContentValues args = new ContentValues();
+        args.put(VHF_SERIAL, newValue);
+
+        Idb.update(TRANSF_VHF_SER, args, null, null);
+
+
+    }
+
+
+
+    public void updateIsExport() {
+        Idb = this.getWritableDatabase();
+        //SERIAL_NO4 + " = '" + serialNo + "' and " +
+
+        ContentValues args = new ContentValues();
+        args.put(IS_EXPORT4, "1");
+
+        Idb.update(ITEMS_INFO, args, null, null);
+
+
+    }
+    public void updateIsExportTransfer() {
+        Idb = this.getWritableDatabase();
+        //SERIAL_NO4 + " = '" + serialNo + "' and " +
+
+        ContentValues args = new ContentValues();
+        args.put(ISEXPORT8, "1");
+
+        Idb.update(TRANSFER_ITEMS_INFO, args, null, null);
+
+
+    }
+
+
+
+
+
+   public void deleteAllItem(String tableName)
+   {
+//             Idb.execSQL("DELETE FROM "+tableName); //delete all rows in a table
+       SQLiteDatabase db = this.getWritableDatabase();
+       db.execSQL("delete from " + tableName);
+       db.close();
+         }
+
+    public void delete(String Itemcode,String ItemName) {
+        Idb.execSQL("DELETE FROM "+ITEM_CARD+" where ITEM_CODE = '"+Itemcode +"' and ITEM_NAME = '"+ItemName+"'"); //delete all rows in a table
+    }
+
+    public void deleteItemCardByItemCode(String ItemCode) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM "+ITEM_CARD+" where ITEM_CODE = '"+ItemCode +"'"); //delete item code rows in a table
+        db.close();
+
+    }
+    public void deleteItemCardByItemCodetest(String ItemCode) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM "+ITEM_CARD+" where ITEM_CODE = '"+ItemCode +"'"); //delete item code rows in a table
+        db.close();
+
+    }
+
+    public void deleteItemSwitchByItemCode(String ITEM_O_CODEs,String ITEM_N_CODEs) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM "+ITEM_SWITCH+" where ITEM_O_CODE = '"+ITEM_O_CODEs +"' and ITEM_N_CODE = '"+ITEM_N_CODEs+"'"); //delete item code rows in a table
+        db.close();
+
+    }
+
+    public void deleteItemFromItemInfo(String ItemCode,String SERIALNo) {
+        Idb.execSQL("DELETE FROM "+ITEMS_INFO+" where ITEM_CODE = '"+ItemCode +"' and SERIAL_NO = '"+SERIALNo+"'"); //delete all rows in a table
+    }
+
+
+    public String convertToEnglish(String value) {
+        String newValue = (((((((((((value + "").replaceAll("١", "1")).replaceAll("٢", "2")).replaceAll("٣", "3")).replaceAll("٤", "4")).replaceAll("٥", "5")).replaceAll("٦", "6")).replaceAll("٧", "7")).replaceAll("٨", "8")).replaceAll("٩", "9")).replaceAll("٠", "0").replaceAll("٫","."));
+        return newValue;
+    }
+}

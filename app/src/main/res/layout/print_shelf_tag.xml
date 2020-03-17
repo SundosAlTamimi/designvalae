@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/inv2"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bac_"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView31"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/print_shelf_tag"
+            android:textColor="@color/grayLight"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/editText8"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/orFloor"
+            android:ems="10" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="5dp">
+
+                        <TextView
+                            android:id="@+id/textView32"
+                            android:layout_width="95dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/item_code"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/ItemCodeEditTextTag"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_bac"
+                            android:ems="10"
+                            android:inputType="textPersonName"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <Button
+                            android:id="@+id/SearchButtonTag"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@android:drawable/ic_menu_search" />
+
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="5dp">
+
+                        <TextView
+                            android:id="@+id/textView33"
+                            android:layout_width="95dp"
+                            android:layout_height="wrap_content"
+                            android:text="@string/item_name"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/ItemNameEditTextTag"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_bac"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="5dp">
+
+                        <TextView
+                            android:id="@+id/textView331"
+                            android:layout_width="95dp"
+                            android:layout_height="wrap_content"
+                            android:text="Item Price"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/PriceEditTextTag"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_bac"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <CheckBox
+                            android:id="@+id/PriceCheckBoxTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="Price"
+                            android:textColor="@color/textColor"
+                            android:textSize="12sp" />
+                    </TableRow>
+
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="5dp"
+                        android:gravity="center|start">
+
+                        <TextView
+                            android:id="@+id/textView332"
+                            android:layout_width="95dp"
+                            android:layout_height="wrap_content"
+                            android:text="Expiry Date"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/ExpEditTextTag"
+                            android:layout_width="120dp"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/edit_bac"
+                            android:ems="10"
+                            android:inputType="textPersonName"
+                            android:textColor="@color/textColor"
+                            android:textSize="16sp" />
+
+                        <CheckBox
+                            android:id="@+id/ExpCheckBoxTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="With Exp."
+                            android:textColor="@color/textColor"
+                            android:textSize="12sp" />
+                    </TableRow>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TableRow
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="10dp"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/textView57"
+                            android:layout_width="109dp"
+                            android:layout_height="50dp"
+                            android:gravity="center"
+                            android:text="Copy :"
+                            android:textColor="@color/textColor"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <ImageButton
+                            android:id="@+id/up"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_marginLeft="7dp"
+                            android:layout_marginRight="7dp"
+                            android:background="@drawable/arrowup"
+                            app:srcCompat="@drawable/background_buttons" />
+
+                        <TextView
+                            android:id="@+id/countT"
+                            android:layout_width="54dp"
+                            android:layout_height="50dp"
+                            android:layout_marginRight="7dp"
+                            android:background="@drawable/focused_table"
+                            android:gravity="center"
+                            android:text="1"
+                            android:textColor="@color/textColor"
+                            android:textSize="20sp" />
+
+                        <ImageButton
+                            android:id="@+id/down"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:background="@drawable/arrowdown"
+                            app:srcCompat="@drawable/background_buttons" />
+
+                    </TableRow>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/textView40"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:text="Shelf Tag Design"
+                        android:textColor="@color/ExitButton" />
+
+                    <LinearLayout
+                        android:id="@+id/shelfTagLiner"
+                        android:layout_width="300dp"
+                        android:layout_height="110dp"
+                        android:background="@color/white"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/itemNamePrint"
+                            android:layout_width="250dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="item Name"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:id="@+id/barcodeShelfPrint"
+                            android:layout_width="250dp"
+                            android:layout_height="40dp"
+                            android:layout_gravity="center"
+                            app:srcCompat="@drawable/barcodes" />
+
+                        <TextView
+                            android:id="@+id/barcodeText"
+                            android:layout_width="250dp"
+                            android:layout_height="10dp"
+                            android:layout_gravity="center"
+                            android:gravity="center"
+                            android:text="03155454545"
+                            android:textColor="@color/black"
+                            android:textSize="8sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="250dp"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center"
+                            android:orientation="horizontal"
+                            tools:ignore="MissingConstraints">
+
+                            <LinearLayout
+                                android:id="@+id/priceLinerPrint"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/textView41"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="2"
+                                    android:text="Price :"
+                                    android:textColor="@color/black"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/pricePrint"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="545.0 JD"
+                                    android:textColor="@color/black"
+                                    android:textSize="18sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/ExpLinerTag"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="2"
+                                android:gravity="bottom"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:id="@+id/textView421"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="EXP:"
+                                    android:textColor="@color/black"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/exp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="20/20/2020"
+                                    android:textColor="@color/black"
+                                    android:textSize="10sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:background="@drawable/no_thing"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/printShelfTag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/edit_button"
+                        android:text="Print "
+                        android:textAllCaps="false"
+                        android:textColor="@color/orFloor"
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/ClearButtonTag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/edit_button"
+                        android:text="@string/clear"
+                        android:textAllCaps="false"
+                        android:textColor="@color/orFloor"
+                        android:textSize="18sp" />
+
+                    <Button
+                        android:id="@+id/exit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/edit_button"
+                        android:text="@string/exit"
+                        android:textAllCaps="false"
+                        android:textColor="@color/orFloor"
+                        android:textSize="18sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</LinearLayout>

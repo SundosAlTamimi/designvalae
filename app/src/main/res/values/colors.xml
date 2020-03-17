@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FDD835</color>
+    <color name="colorPrimaryDark">#ABFDD835</color>
+    <color name="colorAccent">#ABFDD835</color>
+    <color name="pinkLow">#D5FDD835</color>
+    <color name="textColor">#232222</color>
+    <color name="UpdateButton">#92d0b1</color>
+    <color name="clearButton">#1F6381</color>
+    <color name="saveButton">#B4E8D0DC</color>
+    <color name="NewButton">#f2e9e2</color>
+    <color name="searchButton">#9ed9f4</color>
+    <color name="freeButton">#faf8f9</color>
+    <color name="ExitButton">#DAC24641</color>
+    <color name="exit_hover">#E77471</color>
+    <color name="light_blue">#e8d1e6fd</color>
+    <color name="dark_blue">#89cbee</color>
+    <color name="gray">#34abb5</color>
+    <color name="floor">#ECDAE1</color>
+    <color name="end">#E49E99</color>
+    <color name="export">#95BB8A</color>
+    <color name="prep">#0B8D8C</color>
+    <color name="layout1">#FDC96344</color>
+    <color name="layout2">#92355e</color>D0994A24
+    <color name="orFloor">#A3044C72</color>
+    <color name="orFloor2">#E85F4E02</color>
+    <!--ffe6eb-->
+    <!--#157ce7-->
+    <color name="layou1">#ffe6eb</color>
+    <color name="layou2">#DEFCFC</color>
+    <color name="layou3">#cbf1f5</color>
+    <color name="layou4">#87DFE8</color>
+
+
+
+    <color name="blueDark">#1148DE</color>
+    <color name="blueLight">#2196f3</color>
+    <color name="grayLight">#FEFFFDFD</color>
+    <color name="white">#FDFCFC</color>
+    <!--FDFCFC-->
+    <color name="black">#0f1215</color>
+
+    <color name="done_button">#327C41</color>
+    <color name="cancel_button">#C24641</color>
+
+<!--//CBEEB462-->
+    <color name="color1">#2196f3</color>
+    <color name="color2">#B2EE7662</color>
+    <color name="color3">#B7534666</color>
+    <color name="color4">#9E138086</color>
+    <color name="color5">#A4DC8665</color>
+    <color name="color6">#02FFFDFC</color>
+</resources>
