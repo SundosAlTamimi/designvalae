@@ -1,4 +1,4 @@
-#Mon Mar 16 13:06:38 EET 2020
-base.0=C\:\\Users\\user54\\AndroidStudioProjects\\designvalae\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out
+#Sun Apr 05 01:21:02 EEST 2020
+base.0=C\:\\Users\\Rawan_Riyad\\StudioProjects\\designvalae\\app\\build\\intermediates\\dex\\debug\\mergeDexDebug\\out
 path.0=classes.dex
 renamed.0=classes.dex
