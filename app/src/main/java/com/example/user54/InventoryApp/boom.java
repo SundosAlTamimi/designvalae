@@ -30,7 +30,7 @@ import com.nightonke.boommenu.OnBoomListener;
 
 public class boom extends AppCompatActivity {
 
-    CircleMenu circleMenu; 
+    CircleMenu circleMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
