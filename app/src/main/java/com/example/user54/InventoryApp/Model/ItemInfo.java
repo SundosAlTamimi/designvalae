@@ -17,14 +17,16 @@ public class ItemInfo  {
     private float salePrice;
     private String TrnDate;
     private String isExport;
+    private String Location;
+    private String QRCode;
+    private String LotNo;
+    private String IsDelete;
 
     public ItemInfo() {
 
     }
 
-    public ItemInfo(String itemCode, String itemName, float itemQty, float rowIndex,
-                    String itemLocation, int serialNo, String expDate, float salePrice,
-                    String trnDate, String isExport) {
+    public ItemInfo(String itemCode, String itemName, float itemQty, float rowIndex, String itemLocation, int serialNo, String expDate, float salePrice, String trnDate, String isExport, String location, String QRCode, String lotNo) {
         this.itemCode = itemCode;
         this.itemName = itemName;
         this.itemQty = itemQty;
@@ -35,6 +37,9 @@ public class ItemInfo  {
         this.salePrice = salePrice;
         this.TrnDate = trnDate;
         this.isExport = isExport;
+        this.Location = location;
+        this.QRCode = QRCode;
+        this.LotNo = lotNo;
     }
 
     public void setSerialNo(int serialNo) {
@@ -117,10 +122,43 @@ public class ItemInfo  {
         TrnDate = trnDate;
     }
 
+    public String getLocation() {
+        return Location;
+    }
+
+    public void setLocation(String location) {
+        Location = location;
+    }
+
+    public String getQRCode() {
+        return QRCode;
+    }
+
+    public void setQRCode(String QRCode) {
+        this.QRCode = QRCode;
+    }
+
+    public String getLotNo() {
+        return LotNo;
+    }
+
+    public void setLotNo(String lotNo) {
+        LotNo = lotNo;
+    }
+
+    public String getIsDelete() {
+        return IsDelete;
+    }
+
+    public void setIsDelete(String isDelete) {
+        IsDelete = isDelete;
+    }
+
     //{"JRD":[{"ITEMCODE":"10115","ITEMNAME":"مادة1","STORENO":"1","ITEMQTY":"10","ROWINDEX":"1","EXPIRYDATE":"18/10/2025","TRDATE":"20/02/2020","SALESPRICE":"1.10"},{"ITEMCODE":"10115","ITEMNAME":"مادة1","STORENO":"1","ITEMQTY":"10","ROWINDEX":"1","EXPIRYDATE":"18/10/2025","TRDATE":"20/02/2020","SALESPRICE":"1.11"}]}
     public JSONObject getJSONObject2() { // for server
         JSONObject obj = new JSONObject();
         try {
+
             obj.put("ITEMCODE", itemCode);
             obj.put("ITEMNAME", itemName);
             obj.put("STORENO", itemLocation);
@@ -129,6 +167,10 @@ public class ItemInfo  {
             obj.put("EXPIRYDATE",ExpDate );
             obj.put("TRDATE", TrnDate);
             obj.put("SALESPRICE", salePrice);
+            obj.put("LOCATION", Location);
+            obj.put("QRCODE", QRCode);
+            obj.put("LOTNUMBER", LotNo);
+
 
         } catch (JSONException e) {
             Log.e("Tag" , "JSONException");

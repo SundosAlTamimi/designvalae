@@ -202,4 +202,33 @@
     <string name="faildstore">فشل استيراد Store</string>
     <string name="Import_Item_Card">Import Item Card</string>
     <string name="NotCorrectPassword">Not Correct Password</string>
+    <string name="print_assesst">طباعة الاصول</string>
+    <string name="fildtoimportitemAssets">فشل استيراد الاصول الرجاء المحاوله لاحقا</string>
+    <string name="importassets">استيراد الاصول ...</string>
+    <string name="assestSave">تم حفظ الاصول بنجاح </string>
+    <string name="not_minus">+</string>
+    <string name="minus">-</string>
+    <string name="qty_kind">نوع الكميه</string>
+    <string name="assets">الاصول</string>
+    <string name="management">الاداره </string>
+    <string name="department">دائره </string>
+    <string name="section">القسم </string>
+    <string name="area_name">الموقع </string>
+    <string name="assets_code">رقم الاصل </string>
+    <string name="assets_name">اسم الاصل </string>
+    <string name="assfailedtoExport">فشل تصدير الاصول !!</string>
+    <string name="assetsExport">تصدير الاصول !!</string>
+    <string name="allAssestExport">تم تصدير جميع الاصول !!</string>
+    <string name="export_db">تصدير DB</string>
+    <string name="import_db">استيراد Db</string>
+    <string name="Permission_">الاذونات</string>
+    <string name="Permission_Please">الرجاء السماح للتطبيق بالتخزين </string>
+    <string name="AssetsSave">Save Assets In Db</string>
+    <string name="qr_code">QR كود</string>
+    <string name="lot_no">Lot رقم </string>
+    <string name="importItemQR"> استيراد QR</string>
+    <string name="falidedimportItemQR">فشل استيراد QR </string>
+    <string name="saveItemQr">Save Item QR In Db</string>
+    <string name="saveitemQR">save item QR</string>
+
 </resources>

@@ -6,9 +6,9 @@ public class ItemUnit {
     private String itemBarcode ;
     private float salePrice;
     private String itemU;
-    private int UQty;
+    private float UQty;
     private int uSerial;
-    private int calcQty;
+    private float calcQty;
     private float wholeSalePrc;
     private float purchasePrc;
     private float pclAss1;
@@ -17,20 +17,21 @@ public class ItemUnit {
     private String inDate;
     private String unitName;
 
+    private  String orgSalePrice ;
+    private  String oldSalePrice;
+    private  String updateDate ;
+
+
     public ItemUnit() {
     }
 
-    public ItemUnit(String itemOCode, String itemBarcode, float salePrice,
-                    String itemU, int UQty, int uesrIal, int calcQty, float wholeSalePrc,
-                    float purchasePrc, float pclAss1, float pclAss2, float pclAss3,
-                    String inDate, String unitName) {
-
+    public ItemUnit(String itemOCode, String itemBarcode, float salePrice, String itemU, float UQty, int uSerial, float calcQty, float wholeSalePrc, float purchasePrc, float pclAss1, float pclAss2, float pclAss3, String inDate, String unitName, String orgSalePrice, String oldSalePrice, String updateDate) {
         this.itemOCode = itemOCode;
         this.itemBarcode = itemBarcode;
         this.salePrice = salePrice;
         this.itemU = itemU;
         this.UQty = UQty;
-        this.uSerial = uesrIal;
+        this.uSerial = uSerial;
         this.calcQty = calcQty;
         this.wholeSalePrc = wholeSalePrc;
         this.purchasePrc = purchasePrc;
@@ -39,6 +40,9 @@ public class ItemUnit {
         this.pclAss3 = pclAss3;
         this.inDate = inDate;
         this.unitName = unitName;
+        this.orgSalePrice = orgSalePrice;
+        this.oldSalePrice = oldSalePrice;
+        this.updateDate = updateDate;
     }
 
     public void setItemOCode(String itemOCode) {
@@ -57,7 +61,7 @@ public class ItemUnit {
         this.itemU = itemU;
     }
 
-    public void setUQty(int UQty) {
+    public void setUQty(float UQty) {
         this.UQty = UQty;
     }
 
@@ -65,7 +69,7 @@ public class ItemUnit {
         this.uSerial = uesrIal;
     }
 
-    public void setCalcQty(int calcQty) {
+    public void setCalcQty(float calcQty) {
         this.calcQty = calcQty;
     }
 
@@ -97,6 +101,21 @@ public class ItemUnit {
         this.unitName = unitName;
     }
 
+    public void setuSerial(int uSerial) {
+        this.uSerial = uSerial;
+    }
+
+    public void setOrgSalePrice(String orgSalePrice) {
+        this.orgSalePrice = orgSalePrice;
+    }
+
+    public void setOldSalePrice(String oldSalePrice) {
+        this.oldSalePrice = oldSalePrice;
+    }
+
+    public void setUpdateDate(String updateDate) {
+        this.updateDate = updateDate;
+    }
     //_________________________________________________________________________
 
     public String getItemOCode() {
@@ -115,7 +134,7 @@ public class ItemUnit {
         return itemU;
     }
 
-    public int getUQty() {
+    public float getUQty() {
         return UQty;
     }
 
@@ -123,7 +142,7 @@ public class ItemUnit {
         return uSerial;
     }
 
-    public int getCalcQty() {
+    public float getCalcQty() {
         return calcQty;
     }
 
@@ -153,5 +172,17 @@ public class ItemUnit {
 
     public String getUnitName() {
         return unitName;
+    }
+
+    public String getOrgSalePrice() {
+        return orgSalePrice;
+    }
+
+    public String getOldSalePrice() {
+        return oldSalePrice;
+    }
+
+    public String getUpdateDate() {
+        return updateDate;
     }
 }

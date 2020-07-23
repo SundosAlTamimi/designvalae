@@ -888,6 +888,7 @@ drawable alternate_buttons
 drawable alternativecode
 drawable arrowdown
 drawable arrowup
+drawable assest
 drawable bac
 drawable bac3
 drawable bac_
@@ -964,10 +965,12 @@ drawable ic_exit_to_app_black_24dp
 drawable ic_launcher_background
 drawable ic_launcher_foreground
 drawable ic_library_add_black_24dp
+drawable ic_local_play_black_24dp
 drawable ic_play_arrow_black_24dp
 drawable ic_print_black_24dp
 drawable ic_save_black_24dp
 drawable ic_search_black_24dp
+drawable ic_system_update_alt_black_24dp
 drawable ic_transform_black_24dp
 drawable ic_update_black_24dp
 drawable icobarcode
@@ -1072,6 +1075,9 @@ id ALT
 id AccumCheckBox
 id AllQt1y
 id AllQty
+id AreaSpin
+id Assesst
+id AssestCheckBox
 id Avl
 id BarcodeText
 id BarcodetextView
@@ -1087,6 +1093,7 @@ id ExpDateCheckBox
 id ExpEditTextTag
 id ExpLiner
 id ExpLinerTag
+id ExportDb
 id FUNCTION
 id ItemBCode
 id ItemBName
@@ -1112,9 +1119,13 @@ id RDel
 id SHIFT
 id SYM
 id SearchButtonTag
+id Stor
 id StoreName
+id Storno
 id Table
 id UpDateButton
+id UpdateQty
+id _qty
 id accu
 id action_bar
 id action_bar_activity_content
@@ -1141,6 +1152,7 @@ id alertMessage
 id alertTitle
 id all
 id always
+id assesstText
 id async
 id avlQty
 id barcode
@@ -1299,6 +1311,7 @@ id del
 id deleteAllItem
 id deleteItem
 id deny
+id depSpin
 id design
 id dimensions
 id direct
@@ -1338,6 +1351,7 @@ id expTransfera
 id expand_activities_button
 id expanded_menu
 id export
+id ff
 id fill
 id fill_horizontal
 id fill_vertical
@@ -1370,6 +1384,7 @@ id imageView5
 id imageView6
 id impText
 id impTexts
+id importDb
 id inBack
 id inBounce
 id inCirc
@@ -1398,6 +1413,8 @@ id item
 id itemAQtyB
 id itemAllBe
 id itemAllBef
+id itemAssest
+id itemBar
 id itemCNew
 id itemCode
 id itemCodeB
@@ -1446,6 +1463,7 @@ id list_item
 id ll
 id loading
 id location
+id locations
 id log
 id log1
 id log2
@@ -1453,8 +1471,10 @@ id log3
 id log4
 id log5
 id log6
+id lotNo
 id main
 id mainSetting
+id manSpin
 id mask_left
 id mask_right
 id master
@@ -1464,6 +1484,8 @@ id men3
 id men4
 id message
 id middle
+id min
+id minus
 id multiply
 id neutral_button
 id never
@@ -1476,6 +1498,8 @@ id newPass
 id newQty
 id none
 id normal
+id notMin
+id notMinus
 id note
 id noteM
 id notification_background
@@ -1565,6 +1589,7 @@ id progressWheel
 id progress_circular
 id progress_dialog
 id progress_horizontal
+id qrCode
 id qty
 id radio
 id receirtNo
@@ -1605,6 +1630,7 @@ id search_mag_icon
 id search_plate
 id search_src_text
 id search_voice_btn
+id secSpin
 id select_dialog_listview
 id send
 id sendSer
@@ -1757,6 +1783,7 @@ id upBarcode
 id upDateQyt
 id upDateRecip
 id updaCh
+id update
 id updateBu
 id updateCheckBox
 id updateExp
@@ -1836,6 +1863,7 @@ layout abc_search_dropdown_item_icons_2line
 layout abc_search_view
 layout abc_select_dialog_material
 layout abc_tooltip
+layout activity_assets_data_yellow
 layout activity_collecting_data
 layout activity_collecting_data_yellow
 layout activity_main
@@ -1849,6 +1877,7 @@ layout app
 layout barcode_print_dialog
 layout barcode_print_dialog2
 layout bluetooth_menu
+layout bluetooth_menu_esc
 layout bmb
 layout bmb_ham_button
 layout bmb_simple_circle_button
@@ -1893,6 +1922,7 @@ layout notification_template_custom_big
 layout notification_template_icon_group
 layout notification_template_part_chronometer
 layout notification_template_part_time
+layout print_assesst_item_yellow
 layout print_item_barcode
 layout print_item_barcode_yellow
 layout print_shelf_tag
@@ -1911,6 +1941,7 @@ layout shlf_tag_dialog
 layout shlf_tag_dialog2
 layout shlf_tag_dialog_design2
 layout shlf_tag_dialog_design3
+layout shlf_tag_dialog_design3_
 layout spinner_style
 layout support_simple_spinner_dropdown_item
 layout title_for_print
@@ -1923,6 +1954,7 @@ layout transfer_data_yellow
 layout update_dialog_new
 layout update_layout
 layout update_layout_yellow
+layout update_qty_yellow
 layout zxing_barcode_scanner
 layout zxing_capture
 mipmap collectdata
@@ -1939,6 +1971,7 @@ mipmap itemb
 mipmap report2
 mipmap send1
 raw zxing_beep
+string AssetsSave
 string ImporItemStore
 string ImportItemSwitch
 string Import_Item_Card
@@ -1946,6 +1979,8 @@ string LOADING
 string New
 string NotCorrectPassword
 string Permission
+string Permission_
+string Permission_Please
 string _0
 string _1
 string abc_action_bar_home_description
@@ -1991,6 +2026,7 @@ string accumlate_item
 string accumulate_item
 string acumalateitem
 string alert_message
+string allAssestExport
 string allExport
 string allItemDelete
 string allTexoprt
@@ -1998,7 +2034,14 @@ string all_qty
 string alternate
 string app_name
 string areYouSurre
+string area_name
 string aresure
+string assestSave
+string assets
+string assetsExport
+string assets_code
+string assets_name
+string assfailedtoExport
 string avl_qty
 string barcode
 string barcode_design
@@ -2029,6 +2072,7 @@ string delete_all_item
 string delete_item
 string delete_item_
 string deletethisitem
+string department
 string des_1
 string des_2
 string des_3
@@ -2047,6 +2091,7 @@ string exp_date
 string expiry_date
 string export
 string export_alternative_code
+string export_db
 string export_item_data_by_expiry
 string export_item_data_to_text
 string export_transfer_item_data
@@ -2061,14 +2106,19 @@ string faildstore
 string faildtoimport
 string falcons_soft_inventory_application
 string falidTogetdata
+string falidedimportItemQR
+string fildtoimportitemAssets
 string fildtoimportitemswitch
 string file_path
 string from_store
 string fromtable
 string importData
 string importDataMessage
+string importItemQR
 string importSuc
+string import_db
 string import_item_from_text_file
+string importassets
 string importitemcard
 string importitemswitch
 string importstor
@@ -2093,14 +2143,18 @@ string list_of_update
 string location
 string lodaing
 string log_in
+string lot_no
 string mainSetting
 string main_setting
+string management
+string minus
 string new_item
 string new_password
 string new_qty
 string newq
 string noexport
 string nomainSetting
+string not_minus
 string notcorrectusernamepass
 string notless
 string ok
@@ -2113,11 +2167,14 @@ string prepare
 string previous_scan
 string price
 string print
+string print_assesst
 string print_item_barcode
 string print_shelf_tag
 string printer_setting
+string qr_code
 string qty
 string qty_0
+string qty_kind
 string r_del
 string receipt_no
 string receive_data_from_server
@@ -2128,8 +2185,10 @@ string sale
 string sale_prc
 string sale_price
 string save
+string saveItemQr
 string saveMainSetting
 string save_SUCCESS
+string saveitemQR
 string saveitemcard
 string saveitemswitch
 string savingindb
@@ -2137,6 +2196,7 @@ string savingitemswitch
 string scan
 string search
 string search_menu_title
+string section
 string send_and_recieve
 string send_data_to_server
 string serial_no

@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="AssetsSave">Save Assets In Db</string>
     <string name="Import_Item_Card">Import Item Card</string>
     <string name="New">جديد</string>
     <string name="NotCorrectPassword">Not Correct Password</string>
     <string name="Permission">No Bluetooth Permission</string>
+    <string name="Permission_">الاذونات</string>
+    <string name="Permission_Please">الرجاء السماح للتطبيق بالتخزين </string>
     <string name="_0">0</string>
     <string name="_1">1</string>
     <string msgid="4600421777120114993" name="abc_action_bar_home_description">"التنقل إلى الشاشة الرئيسية"</string>
@@ -37,6 +40,7 @@
     <string name="accumulate_item">تجميع </string>
     <string name="acumalateitem">المواد في الجدول غير مجمعه</string>
     <string name="alert_message">Alert Message</string>
+    <string name="allAssestExport">تم تصدير جميع الاصول !!</string>
     <string name="allExport">جميع البيانات تم تصديرها</string>
     <string name="allItemDelete"> هل تريد حذف جميع المواد في الجدول ؟</string>
     <string name="allTexoprt">جميع بيانات المخزن تم ترحيلها </string>
@@ -44,7 +48,14 @@
     <string name="alternate">تبديل</string>
     <string name="app_name">Inventory App </string>
     <string name="areYouSurre">هل انت متاكد ؟</string>
+    <string name="area_name">الموقع </string>
     <string name="aresure">هل انت متاكد؟</string>
+    <string name="assestSave">تم حفظ الاصول بنجاح </string>
+    <string name="assets">الاصول</string>
+    <string name="assetsExport">تصدير الاصول !!</string>
+    <string name="assets_code">رقم الاصل </string>
+    <string name="assets_name">اسم الاصل </string>
+    <string name="assfailedtoExport">فشل تصدير الاصول !!</string>
     <string name="avl_qty">AVL.QTY</string>
     <string name="barcode">الباركود</string>
     <string name="barcode_design">تصميم الباركود</string>
@@ -74,6 +85,7 @@
     <string name="delete_item">حذف ماده</string>
     <string name="delete_item_">هل تريد حذف هذه الماده ...</string>
     <string name="deletethisitem">هل تريد حذف هذه الماده ...</string>
+    <string name="department">دائره </string>
     <string name="des_1">تصميم1</string>
     <string name="des_2">تصميم2</string>
     <string name="des_3">تصميم3</string>
@@ -89,6 +101,7 @@
     <string name="expiry_date">تاريخ الانتهاء</string>
     <string name="export">تصدير</string>
     <string name="export_alternative_code">Export Alternative Code</string>
+    <string name="export_db">تصدير DB</string>
     <string name="export_item_data_by_expiry">Export Item Data By Expiry</string>
     <string name="export_item_data_to_text">عرض المواد</string>
     <string name="export_transfer_item_data">Export Transfer Item Data</string>
@@ -103,14 +116,19 @@
     <string name="faildtoimport">فشل استيراد item Switch </string>
     <string name="falcons_soft_inventory_application">Falcons Soft. Inventory Application</string>
     <string name="falidTogetdata">فشل استيراد البيانات الرجاء المحاوله لاحقا </string>
+    <string name="falidedimportItemQR">فشل استيراد QR </string>
+    <string name="fildtoimportitemAssets">فشل استيراد الاصول الرجاء المحاوله لاحقا</string>
     <string name="fildtoimportitemswitch">فشل استيراد item Card </string>
     <string name="file_path">File Path</string>
     <string name="from_store">من مخزن</string>
     <string name="fromtable">from  Table ?</string>
     <string name="importData">استيراد البيانات ...</string>
     <string name="importDataMessage">سيتم استيراد البيانات , هل تريد الاستمرار ؟</string>
+    <string name="importItemQR"> استيراد QR</string>
     <string name="importSuc">تم الاستيراد بنجاح</string>
+    <string name="import_db">استيراد Db</string>
     <string name="import_item_from_text_file">Import Item From Text File</string>
+    <string name="importassets">استيراد الاصول ...</string>
     <string name="importitemcard">استيراد Item Card...</string>
     <string name="importitemswitch">استيراد item Switch ...</string>
     <string name="importstor">استيراد store ...</string>
@@ -135,14 +153,18 @@
     <string name="location">الموقع</string>
     <string name="lodaing">تحميل</string>
     <string name="log_in">دخول</string>
+    <string name="lot_no">Lot رقم </string>
     <string name="mainSetting">الرجاء اضافة الاعدادات</string>
     <string name="main_setting">الاعدادات </string>
+    <string name="management">الاداره </string>
+    <string name="minus">-</string>
     <string name="new_item">ماده جديده</string>
     <string name="new_password">كلمة السر الجديده</string>
     <string name="new_qty">الكميه الجديده :</string>
     <string name="newq">الرجاء اضافه كميه جديده</string>
     <string name="noexport">لا يوجد مواد لترحيلها </string>
     <string name="nomainSetting">لا يوجد اعدادات لذلك لا يوجد IP</string>
+    <string name="not_minus">+</string>
     <string name="notcorrectusernamepass">كلمه السر او اسم المستخدم غير صحيحيه الرجاء اعادة المحاوله !</string>
     <string name="notless">اقل عدد نسخ هي 1 فقط </string>
     <string name="ok">نعم</string>
@@ -155,11 +177,14 @@
     <string name="previous_scan">الجرد السابق</string>
     <string name="price">السعر</string>
     <string name="print">طباعه</string>
+    <string name="print_assesst">طباعة الاصول</string>
     <string name="print_item_barcode">طباعة باركود للماده</string>
     <string name="print_shelf_tag">تسعير</string>
     <string name="printer_setting">اعدادات الطابعه</string>
+    <string name="qr_code">QR كود</string>
     <string name="qty">كميه</string>
     <string name="qty_0">لا يمكن عمل تعديل على الكميه بقيمه 0</string>
+    <string name="qty_kind">نوع الكميه</string>
     <string name="r_del">حذف سطري</string>
     <string name="receipt_no">Receipt NO</string>
     <string name="receive_data_from_server">استقبال البيانات </string>
@@ -170,8 +195,10 @@
     <string name="sale_prc">سعر البيع</string>
     <string name="sale_price">سعر البيع </string>
     <string name="save">حفظ</string>
+    <string name="saveItemQr">Save Item QR In Db</string>
     <string name="saveMainSetting">تم حفظ التعديلات</string>
     <string name="save_SUCCESS">تم الحفظ بنجاح</string>
+    <string name="saveitemQR">save item QR</string>
     <string name="saveitemcard">تم حفظ item Card بنجاح </string>
     <string name="saveitemswitch">تم حفظ item Switch بنجاح</string>
     <string name="savingindb">يتم حفظ Item Card  في قاعدة البيانات ...</string>
@@ -179,6 +206,7 @@
     <string name="scan">مسح </string>
     <string name="search">بحث</string>
     <string msgid="146198913615257606" name="search_menu_title">"البحث"</string>
+    <string name="section">القسم </string>
     <string name="send_and_recieve">استيراد</string>
     <string name="send_data_to_server">ارسال البيانات </string>
     <string name="serial_no">الرقم المتسلسل</string>

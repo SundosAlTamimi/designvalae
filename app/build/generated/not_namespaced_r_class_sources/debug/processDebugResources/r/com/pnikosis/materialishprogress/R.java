@@ -26,8 +26,8 @@ public final class R {
     public static final class string {
         private string() {}
 
-        public static final int app_name = 0x7f0e0039;
-        public static final int default_progressbar = 0x7f0e0052;
+        public static final int app_name = 0x7f0e003d;
+        public static final int default_progressbar = 0x7f0e005d;
     }
     public static final class styleable {
         private styleable() {}

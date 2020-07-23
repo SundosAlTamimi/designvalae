@@ -16,15 +16,15 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="3"
+            android:layout_weight="6"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/home"
                 android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginBottom="15dp"
+                android:layout_height="40dp"
+                android:layout_marginBottom="10dp"
                 android:background="@mipmap/icon_home" />
 
             <TextView
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/item"
                 android:textColor="@color/grayLight"
-                android:textSize="40sp"
+                android:textSize="30sp"
                 android:textStyle="bold"
                 app:fontFamily="serif-monospace" />
         </LinearLayout>
@@ -73,8 +73,8 @@
 
                         <TextView
                             android:id="@+id/newItems"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:layout_marginLeft="5dp"
                             android:background="@drawable/item_add" />
                     </LinearLayout>
@@ -116,8 +116,8 @@
 
                     <TextView
                         android:id="@+id/shelfs"
-                        android:layout_width="70dp"
-                        android:layout_height="70dp"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
                         android:layout_marginLeft="5dp"
                         android:background="@drawable/selftag" />
                 </LinearLayout>
@@ -163,8 +163,8 @@
 
                         <TextView
                             android:id="@+id/barcodes"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:layout_marginLeft="5dp"
                             android:background="@drawable/barcodes" />
                     </LinearLayout>
@@ -221,6 +221,54 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/Assesst"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/edit_bac_log4"
+                    android:gravity="center">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:background="@drawable/clear_buttons"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/assesstText"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:layout_marginLeft="5dp"
+                            android:background="@drawable/assest" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/ff"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/print_assesst"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        app:fontFamily="@font/amita" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <LinearLayout
                     android:id="@+id/ItemPrice"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -239,8 +287,8 @@
 
                         <TextView
                             android:id="@+id/item"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
                             android:layout_marginLeft="5dp"
                             android:background="@drawable/confirm" />
                     </LinearLayout>

@@ -198,4 +198,33 @@
     <string name="ImportItemSwitch">Import Item Switch</string>
     <string name="ImporItemStore">Import Item Store</string>
     <string name="NotCorrectPassword">Not Correct Password</string>
+    <string name="print_assesst">print Assesst</string>
+    <string name="fildtoimportitemAssets">Failed to Import Item Assets Data</string>
+    <string name="importassets">Import Item Assets...</string>
+    <string name="assestSave">Save Item Assets Success</string>
+    <string name="not_minus">+</string>
+    <string name="minus">-</string>
+    <string name="qty_kind">Qty Kind</string>
+    <string name="assets">Assets</string>
+    <string name="management">Management</string>
+    <string name="department">Department</string>
+    <string name="section">Section</string>
+    <string name="area_name">Area Name</string>
+    <string name="assets_code">Assets Code</string>
+    <string name="assets_name">Assets Name</string>
+    <string name="assfailedtoExport">Assets Failed to Export</string>
+    <string name="assetsExport">Export Assets Item</string>
+    <string name="allAssestExport">All Assets Data Export</string>
+    <string name="export_db">Export Db</string>
+    <string name="import_db">Import Db</string>
+    <string name="Permission_">Permission</string>
+    <string name="Permission_Please">Please Allow Storage Permission</string>
+    <string name="AssetsSave">Save Assets In Db</string>
+    <string name="qr_code">QR Code</string>
+    <string name="lot_no">Lot No</string>
+    <string name="importItemQR">import Item QR</string>
+    <string name="falidedimportItemQR">Failed to Import item Qr Table</string>
+    <string name="saveItemQr">Save Item QR In Db</string>
+    <string name="saveitemQR">save item QR</string>
+
 </resources>

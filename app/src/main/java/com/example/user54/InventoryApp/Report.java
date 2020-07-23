@@ -192,6 +192,11 @@ public class Report extends AppCompatActivity {
                 printExport.putExtra("printKey", "2");
                 startActivity(printExport);
 
+//                Intent o1 = new Intent(Report.this, bMITP.class);
+//                o1.putExtra("printKey", "0");
+//                startActivity(o1);
+
+
             }
         });
 
@@ -237,6 +242,8 @@ public class Report extends AppCompatActivity {
                             @Override
                             public void onClick(SweetAlertDialog sDialog) {
                                  InventDB.deleteAllItem("ITEMS_INFO");
+                                InventDB.updateIsDeleteItemInfoBackup();
+
 //                                itemInfosAcu=InventDB.getAllItemInfoSum();
 //
 //                                itemInfos=InventDB.getAllItemInfo();
@@ -511,6 +518,8 @@ public class Report extends AppCompatActivity {
 
 
                                                 InventDB.deleteItemFromItemInfo(itemInfos.get(index).getItemCode(), String.valueOf(itemInfos.get(index).getSerialNo()));
+
+                                                InventDB.updateIsDeleteItemInfoBackupByItem(itemInfos.get(index).getItemCode(), String.valueOf(itemInfos.get(index).getSerialNo()));
                                                         itemInfosAcu=InventDB.getAllItemInfoSum();
                                                         tableLayout.removeAllViews();
                                                         itemInfos.remove(index);

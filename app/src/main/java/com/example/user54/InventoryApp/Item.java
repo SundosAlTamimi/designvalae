@@ -1,27 +1,16 @@
 package com.example.user54.InventoryApp;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -47,25 +36,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.MediaController;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.user54.InventoryApp.Model.AssestItem;
 import com.example.user54.InventoryApp.Model.ItemCard;
+import com.example.user54.InventoryApp.Model.ItemQR;
 import com.example.user54.InventoryApp.Model.MainSetting;
-import com.example.user54.InventoryApp.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -81,13 +68,12 @@ import pl.droidsonroids.gif.GifImageButton;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.TRANSPARENT;
-import static android.graphics.Color.WHITE;
 
 public class Item extends AppCompatActivity {
 
     private static final int READ_REQUEST_CODE = 42;
 
-    boolean updateOpen = false, openSearch = false, openSave = false, openShelfTag =false,openBarcode = false,openPrice=false;
+    boolean updateOpen = false, openSearch = false, openSave = false, openShelfTag =false,openBarcode = false,openPrice=false,openAssesst=false,openUpdateQty=false;
     int textId = 0;
     String today;
     InventoryDatabase InventDB;
@@ -95,15 +81,19 @@ public class Item extends AppCompatActivity {
     Dialog dialog;
     Animation animFadein;
     TextView Home;
-    DecimalFormat numberFormat = new DecimalFormat("0.00");
+    DecimalFormat numberFormat = new DecimalFormat("0.000");
     public static TextView textView,textItemName;
     public static ItemCard itemCardForPrint;
+    public static AssestItem itemAssesstForPrint;
     TextView pathNameFr,tempText;
     TableRow row;
     public static List<ItemCard> barcodeListForPrint;
-    LinearLayout newItem, importText, pBarcode, pShelfTag ,ItemPrice;
+    public static List<AssestItem> barcodeListForPrintAssest;
+    LinearLayout newItem, importText, pBarcode, pShelfTag ,ItemPrice,Assesst;
     public static List<ItemCard> itemList;
+    public static List<AssestItem> itemListAssest;
     ArrayList<ItemCard> itemCodeCard ;
+    ArrayList<AssestItem> itemAssetsCa ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,10 +115,11 @@ public class Item extends AppCompatActivity {
         pBarcode.startAnimation(animFadein);
         pShelfTag.startAnimation(animFadein);
         ItemPrice.startAnimation(animFadein);
+        Assesst.startAnimation(animFadein);
 
 
         barcodeListForPrint=new ArrayList<>();
-
+        barcodeListForPrintAssest=new ArrayList<>();
         Date currentTimeAndDate = Calendar.getInstance().getTime();
         SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy");
         today = df.format(currentTimeAndDate);
@@ -142,8 +133,10 @@ public class Item extends AppCompatActivity {
 
 
     }
+TextView barCodTextTemp;
+    String StkNo="";
 
-
+    boolean openBarCodeRedar =false;
 
 //
 
@@ -177,6 +170,11 @@ public class Item extends AppCompatActivity {
                     openPrice=true;
                     showItemPriceDialog();
                     break;
+                case R.id.Assesst:
+                    Assesst.setClickable(false);
+                    openAssesst=true;
+                    showPrintAssesstDialog();
+                    break;
 //
             }
         }
@@ -201,7 +199,7 @@ public class Item extends AppCompatActivity {
         open.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openFolder();
+//                openFolder();
 
 
             }
@@ -290,9 +288,22 @@ public class Item extends AppCompatActivity {
                    boolean isFound=false;
                     if(!itemCode.equals("")& openBarcode){
 
-                        itemSwitch=findSwitch(itemCode);
-                        if(!itemSwitch.equals("")){
-                            itemCode=itemSwitch;
+                        List<String>itemUnite=findUnite(itemCode);
+                        int uQty=1;
+
+
+                        if(itemUnite.size()!=0){
+
+                            itemCode=itemUnite.get(0);
+                            uQty=Integer.parseInt(itemUnite.get(2));
+
+                        }else{
+                            itemSwitch=findSwitch(itemCode);
+                            if(!itemSwitch.equals("")){
+                                itemCode=itemSwitch;
+                            }
+                            uQty=1;
+
                         }
 
                         for(int i = 0; i< itemList.size(); i++){
@@ -410,6 +421,17 @@ public class Item extends AppCompatActivity {
 //        });
 
 
+        Button barcode;
+        barcode = dialogBarCode.findViewById(R.id.barcode);
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openBarCodeRedar = true;
+                openBarcode = false;
+                readBarCode(BarcodetextView,1);
+            }
+        });
 
         PrintAllcheckBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -567,6 +589,383 @@ public class Item extends AppCompatActivity {
         dialogBarCode.show();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
+    void showPrintAssesstDialog() {
+        final Dialog dialogBarCodeAssesst = new Dialog(Item.this,R.style.Theme_Dialog);
+        dialogBarCodeAssesst.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogBarCodeAssesst.setCancelable(false);
+        if(controll.isYellow){
+            dialogBarCodeAssesst.setContentView(R.layout.print_assesst_item_yellow);
+        }else{
+            dialogBarCodeAssesst.setContentView(R.layout.print_assesst_item_yellow);
+        }
+//
+
+
+        dialogBarCodeAssesst.setCanceledOnTouchOutside(false);
+
+        final int[] count1 = {1};
+
+        LinearLayout exit,PrintButton;
+        Button searchButton;
+
+        ImageButton upBarcode,downBarcode;
+        final CheckBox PrintAllcheckBox,PriceCheckBox;
+        final TextView countTBarcode,itemNamePrintBarcode,barcodeTextBarcode,pricePrintBarcode;
+//        final TableLayout listOfItemPrint;
+        final EditText BarcodetextView;
+        final ImageView barcodeShelfPrintParcode;
+        final LinearLayout priceLinerPrint;
+        final ListView list=dialogBarCodeAssesst.findViewById(R.id.list);
+
+        priceLinerPrint=(LinearLayout) dialogBarCodeAssesst.findViewById(R.id.priceLinerPrint);
+        searchButton= (Button) dialogBarCodeAssesst.findViewById(R.id.searchButton);
+        PrintButton=  dialogBarCodeAssesst.findViewById(R.id.PrintButton);
+        exit =  dialogBarCodeAssesst.findViewById(R.id.exit);
+
+        upBarcode= (ImageButton) dialogBarCodeAssesst.findViewById(R.id.upBarcode);
+        downBarcode= (ImageButton) dialogBarCodeAssesst.findViewById(R.id.downBarcode);
+
+        PrintAllcheckBox= (CheckBox) dialogBarCodeAssesst.findViewById(R.id.PrintAllcheckBox);
+        PriceCheckBox= (CheckBox) dialogBarCodeAssesst.findViewById(R.id.PriceCheckBox);
+
+        countTBarcode= (TextView) dialogBarCodeAssesst.findViewById(R.id.countTBarcode);
+        itemNamePrintBarcode= (TextView) dialogBarCodeAssesst.findViewById(R.id.itemNamePrintBarcode);
+        barcodeTextBarcode= (TextView) dialogBarCodeAssesst.findViewById(R.id.barcodeTextBarcode);
+        pricePrintBarcode= (TextView) dialogBarCodeAssesst.findViewById(R.id.pricePrintBarcode);
+
+//        listOfItemPrint= (TableLayout) dialogBarCode.findViewById(R.id.listOfItemPrint);
+
+        BarcodetextView= (EditText) dialogBarCodeAssesst.findViewById(R.id.BarcodetextView);
+        barcodeShelfPrintParcode= (ImageView) dialogBarCodeAssesst.findViewById(R.id.barcodeShelfPrintParcode);
+
+        priceLinerPrint.setVisibility(View.INVISIBLE);
+        PriceCheckBox.setVisibility(View.INVISIBLE);
+
+        itemListAssest=new ArrayList<>();
+        itemListAssest=InventDB.getAllAssesstItem();
+        for(int i=0;i<itemListAssest.size();i++){
+//            fillTableRows(listOfItemPrint,itemList.get(i).getItemCode(),itemList.get(i).getItemName(),itemList.get(i).getOrgPrice(),i);
+            itemListAssest.get(i).setCheck(false);
+//            ItemCard itemCard=itemList.get(i);
+//            barcodeListForPrint.add(itemCard);
+        }
+
+        pricePrintBarcode.setVisibility(View.INVISIBLE);
+        final ListAdapterAssesst adapter = new ListAdapterAssesst(Item.this, itemListAssest);
+        list.setAdapter(adapter);
+        BarcodetextView.requestFocus();
+        BarcodetextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_ACTION_NEXT || actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_NULL) {
+                    String itemSwitch="";
+                    String itemCode=BarcodetextView.getText().toString();
+                    boolean isFound=false;
+                    if(!itemCode.equals("")& openAssesst){
+                        List<String>itemUnite=findUnite(itemCode);
+                        int uQty=1;
+
+
+                        if(itemUnite.size()!=0){
+
+                            itemCode=itemUnite.get(0);
+                            uQty=Integer.parseInt(itemUnite.get(2));
+
+                        }else{
+                            itemSwitch=findSwitch(itemCode);
+                            if(!itemSwitch.equals("")){
+                                itemCode=itemSwitch;
+                            }
+                            uQty=1;
+
+                        }
+
+                        for(int i = 0; i< itemListAssest.size(); i++){
+                            if(itemCode.equals(itemListAssest.get(i).getAssesstCode())){
+                                itemNamePrintBarcode.setText(itemListAssest.get(i).getAssesstName());
+                                barcodeTextBarcode .setText(itemListAssest.get(i).getAssesstCode());
+                                pricePrintBarcode.setText("0.0");
+//                            ItemCard itemCard=finalItemList.get(i);
+//                            barcodeListForPrint.add(itemCard);
+
+                                isFound=true;
+                                itemListAssest.get(i).setCheck(true);
+                                adapter.notifyDataSetChanged();
+                                list.setSelection(i);
+
+                                Bitmap bitmap= null;
+                                try {
+                                    bitmap = encodeAsBitmap(itemCode, BarcodeFormat.CODE_128, 350, 100);
+                                    barcodeShelfPrintParcode.setImageBitmap(bitmap);
+                                } catch (WriterException e) {
+                                    e.printStackTrace();
+                                }
+
+
+                                break;
+                            }else{
+
+                                itemNamePrintBarcode.setText("");
+                                barcodeTextBarcode .setText("");
+                                pricePrintBarcode.setText("");
+                            }
+                        }
+
+
+                        if(isFound){
+                            //noThing
+                        }else{
+                            showAlertDialog(getResources().getString(R.string.itemNotFoundAlert));
+                            BarcodetextView .setText("");
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    BarcodetextView.requestFocus();
+                                }
+                            });
+
+
+                        }
+
+
+
+                    }
+
+
+                }
+                return false;
+            }});
+
+
+//        BarcodetextView.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//                itemNamePrintBarcode.setText("Item Name");
+//                barcodeTextBarcode .setText("00000000000");
+//                pricePrintBarcode.setText("0.0");
+//                barcodeListForPrint.clear();
+////                finalItemList = itemList;
+//                barcodeShelfPrintParcode.setImageDrawable(getResources().getDrawable(R.drawable.barcodes));
+//            }
+//
+//            @RequiresApi(api = Build.VERSION_CODES.O)
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//
+//
+//                if(!BarcodetextView.getText().toString().equals("")& openBarcode){
+//
+//                    for(int i = 0; i< itemList.size(); i++){
+//                        if(BarcodetextView.getText().toString().equals(itemList.get(i).getItemCode())){
+//                            itemNamePrintBarcode.setText(itemList.get(i).getItemName());
+//                            barcodeTextBarcode .setText(itemList.get(i).getItemCode());
+//                            pricePrintBarcode.setText(itemList.get(i).getSalePrc());
+////                            ItemCard itemCard=finalItemList.get(i);
+////                            barcodeListForPrint.add(itemCard);
+//
+//                            itemList.get(i).setCheck(true);
+//                            adapter.notifyDataSetChanged();
+//                            list.setSelection(i);
+//
+//                            Bitmap bitmap= null;
+//                            try {
+//                                bitmap = encodeAsBitmap(BarcodetextView.getText().toString(), BarcodeFormat.CODE_128, 350, 100);
+//                                barcodeShelfPrintParcode.setImageBitmap(bitmap);
+//                            } catch (WriterException e) {
+//                                e.printStackTrace();
+//                            }
+//
+//
+//                            break;
+//                        }
+//                    }
+//
+//
+//
+//                }
+//
+////
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//
+//            }
+//        });
+
+
+        Button barcode;
+        barcode = dialogBarCodeAssesst.findViewById(R.id.barcode);
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openBarCodeRedar = true;
+                openAssesst = false;
+                readBarCode(BarcodetextView,5);
+            }
+        });
+
+        PrintAllcheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(PrintAllcheckBox.isChecked()){
+
+                    for (int i = 0; i < itemListAssest.size(); i++) {
+                        itemListAssest.get(i).setCheck(true);
+                    }
+
+                    ListAdapterAssesst adapter = new ListAdapterAssesst(Item.this, itemListAssest);
+                    list.setAdapter(adapter);
+
+                }else{
+                    for (int i = 0; i < itemListAssest.size(); i++) {
+                        itemListAssest.get(i).setCheck(false);
+
+                    }
+
+                    ListAdapterAssesst adapter = new ListAdapterAssesst(Item.this, itemListAssest);
+                    list.setAdapter(adapter);
+
+                }
+            }
+        });
+
+//        PriceCheckBox.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if(PriceCheckBox.isChecked()){
+//                    priceLinerPrint.setVisibility(View.VISIBLE);
+//                }else{
+//                    priceLinerPrint.setVisibility(View.INVISIBLE);
+//                }
+//            }
+//        });
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Assesst.setClickable(true);
+                dialogBarCodeAssesst.dismiss();
+            }
+        });
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSearch = true;
+                openAssesst = false;
+                SearchDialogForAssets(BarcodetextView, 5);
+                BarcodetextView.setSelectAllOnFocus(true);
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        BarcodetextView.requestFocus();
+
+                    }
+                });
+            }
+        });
+
+        upBarcode.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                count1[0]++;
+                countTBarcode.setText("" + count1[0]);
+            }
+        });
+        downBarcode.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onClick(View v) {
+                if (Integer.parseInt(countTBarcode.getText().toString()) != 1) {
+                    count1[0]--;
+                    countTBarcode.setText("" + count1[0]);
+                } else
+//                    Toast.makeText(Item.this, "Copy Not Less Than 1", Toast.LENGTH_SHORT).show();
+                    TostMesage(getResources().getString(R.string.notless));
+            }
+        });
+
+
+//        parentScrollView.setOnTouchListener(new View.OnTouchListener() {
+//
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+////                Log.v(TAG, "PARENT TOUCH");
+//
+//                findViewById(R.id.child_scroll).getParent()
+//                        .requestDisallowInterceptTouchEvent(false);
+//                return false;
+//            }
+//        });
+//
+//
+        list.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+//                Log.v(TAG, "CHILD TOUCH");
+
+                // Disallow the touch request for parent scroll on touch of  child view
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+
+        PrintButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!BarcodetextView.getText().toString().equals("")){
+                    itemAssesstForPrint = new AssestItem();
+                    itemAssesstForPrint.setCount(countTBarcode.getText().toString());
+//                    if (PriceCheckBox.isChecked()) {
+//                        itemCardForPrint.setOrgPrice("");
+//                    } else {
+//                        itemCardForPrint.setOrgPrice("**");
+//                    }
+                    itemAssesstForPrint.setPrice("**");
+                    barcodeListForPrintAssest.clear();
+                    for (int i = 0; i < itemListAssest.size(); i++) {
+
+                        if (itemListAssest.get(i).getCheck()) {
+                            AssestItem assestItem = itemListAssest.get(i);
+                            barcodeListForPrintAssest.add(assestItem);
+                        }
+
+                    }
+
+
+//                    boolean Permission= isStoragePermissionGranted();
+//                    if(Permission) {
+                    Intent intentBarcode = new Intent(Item.this, BluetoothConnectMenu.class);
+                    intentBarcode.putExtra("printKey", "3");
+                    startActivity(intentBarcode);
+//                    }else{
+//                        TostMesage(getResources().getString(R.string.Permission));
+//
+//                    }
+
+
+
+                }else{
+                    TostMesage(getResources().getString(R.string.insertData));
+                }
+
+//                openBarcode = true;
+
+            }
+        });
+
+
+        dialogBarCodeAssesst.show();
+    }
+
+
     void showItemPriceDialog() {
         final Dialog dialogBarCode = new Dialog(Item.this,R.style.Theme_Dialog);
         dialogBarCode.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -648,6 +1047,19 @@ public class Item extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
 
+            }
+        });
+
+
+        Button barcode;
+        barcode = dialogBarCode.findViewById(R.id.barcode);
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openBarCodeRedar = true;
+                openPrice = false;
+                readBarCode(itemCode,2);
             }
         });
 
@@ -751,6 +1163,7 @@ public class Item extends AppCompatActivity {
         dialogBarCode.show();
     }
 
+
     void showPrintShelfTagDialog() {
         dialog = new Dialog(Item.this,R.style.Theme_Dialog);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -831,6 +1244,11 @@ public class Item extends AppCompatActivity {
         designList.add(getResources().getString(R.string.des_2));
         designList.add(getResources().getString(R.string.des_3));
 
+        List<MainSetting> mainSettings = InventDB.getAllMainSetting();
+        if (mainSettings.size() != 0) {
+            StkNo=mainSettings.get(0).getStorNo();
+        }
+
         ArrayAdapter   DesignAdapter = new ArrayAdapter<String>(Item.this, R.layout.spinner_style, designList);
         designSpinner.setAdapter(DesignAdapter);
 
@@ -899,6 +1317,19 @@ public class Item extends AppCompatActivity {
 //        });
 
 
+
+
+        Button barcode;
+        barcode = dialog.findViewById(R.id.barcode);
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openBarCodeRedar = true;
+                openShelfTag = false;
+                readBarCode(ItemCodeEditTextTag,0);
+            }
+        });
 
         ClearButtonTag.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -976,14 +1407,54 @@ public class Item extends AppCompatActivity {
                     String itemCode = ItemCodeEditTextTag.getText().toString();
                     String itemName = ItemNameEditTextTag.getText().toString();
 
-                    String itemSwitch = "";
+                    String itemSwitch = "",QRCode="",Price="";
                     if (!ItemCodeEditTextTag.getText().toString().equals("") && openShelfTag) {
 //                        itemCardsList = InventDB.getAllItemCard();
+                        boolean isPriceUnite=false;
+                        if (itemCode.length() > 17) {
+                            QRCode = itemCode;
+                            itemCode=itemCode.substring(0, 16);
+                            Log.e("String ",""+itemCode);
 
-                        itemSwitch=findSwitch(itemCode);
-                        if(!itemSwitch.equals("")){
-                            itemCode=itemSwitch;
+                        } else {
+                            itemCode = ItemCodeEditTextTag.getText().toString();
                         }
+
+                        List<ItemQR> QRList = findQRCode(itemCode, StkNo);
+
+                        if (QRList.size() != 0) {
+                            itemCode = QRList.get(0).getItemCode();
+
+                            Price = QRList.get(0).getSalesPrice();
+
+                            ItemCodeEditTextTag.setText(itemCode);
+                            isPriceUnite=true;
+                        }else{
+                            List<String>itemUnite=findUnite(itemCode);
+                            int uQty=1;
+
+
+                            if(itemUnite.size()!=0){
+
+                                itemCode=itemUnite.get(0);
+                                uQty=Integer.parseInt(itemUnite.get(2));
+                                Price = itemUnite.get(1);
+                                isPriceUnite=true;
+
+                            }else{
+                                itemSwitch=findSwitch(itemCode);
+                                if(!itemSwitch.equals("")){
+                                    itemCode=itemSwitch;
+                                }
+                                uQty=1;
+                                isPriceUnite=false;
+                            }
+                        }
+
+
+
+
+
 
                         ItemCard itemCard=InventDB.getItemCardByBarCode(itemCode);
                         String it=itemCard.getItemCode();
@@ -993,16 +1464,31 @@ public class Item extends AppCompatActivity {
                             if (it.equals(itemCode)) {
                                 isItemFound = true;
                                 ItemNameEditTextTag.setText(itemCard.getItemName());
-                                PriceEditTextTag.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))));
+                                if(!isPriceUnite) {
+                                    PriceEditTextTag.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))));
+
+                                    pricePrint.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))) + " JD");
+
+                                    pricePrint2.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))) + " JD");
+
+                                    pricePrint3.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))) + " JD");
+
+
+                                }else{
+                                    PriceEditTextTag.setText(convertToEnglish(numberFormat.format(Double.parseDouble(Price))));
+
+                                    pricePrint.setText(convertToEnglish(numberFormat.format(Double.parseDouble(Price))) + " JD");
+
+                                    pricePrint2.setText(convertToEnglish(numberFormat.format(Double.parseDouble(Price))) + " JD");
+
+                                    pricePrint3.setText(convertToEnglish(numberFormat.format(Double.parseDouble(Price))) + " JD");
+                                }
 //                            ExpEditTextTag.setText(itemCardsList.get(i).g());
                                 itemNamePrint.setText(itemCard.getItemName());
-                                pricePrint.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))) + " JD");
                                 exp.setText(ExpEditTextTag.getText().toString());
 
                                 itemNamePrint2.setText(itemCard.getItemName());
-                                pricePrint2.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))) + " JD");
                                 itemNamePrint3.setText(itemCard.getItemName());
-                                pricePrint3.setText(convertToEnglish(numberFormat.format(Double.parseDouble(itemCard.getFDPRC()))) + " JD");
                                 exp2.setText(ExpEditTextTag.getText().toString());
                                 itemText.setText(ItemCodeEditTextTag.getText().toString());
 
@@ -1292,6 +1778,19 @@ public class Item extends AppCompatActivity {
         deleteAllItem =  dialogNew.findViewById(R.id.deleteAllItem);
 
 
+        Button barcode;
+        barcode = dialogNew.findViewById(R.id.barcode);
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openBarCodeRedar = true;
+                openSave = false;
+                readBarCode(itemCodeNew,3);
+            }
+        });
+
+
         itemCodeNew.requestFocus();
 
         deleteItem.setOnClickListener(new View.OnClickListener() {
@@ -1350,10 +1849,22 @@ public class Item extends AppCompatActivity {
                     if (!itemCodeNew.getText().toString().equals("") && openSave) {
                         itemCardsList = InventDB.getAllItemCard();
 
+                        List<String>itemUnite=findUnite(itemCode);
+                        int uQty=1;
 
-                        itemSwitch=findSwitch(itemCode);
-                        if(!itemSwitch.equals("")){
-                            itemCode=itemSwitch;
+
+                        if(itemUnite.size()!=0){
+
+                            itemCode=itemUnite.get(0);
+                            uQty=Integer.parseInt(itemUnite.get(2));
+
+                        }else{
+                            itemSwitch=findSwitch(itemCode);
+                            if(!itemSwitch.equals("")){
+                                itemCode=itemSwitch;
+                            }
+                            uQty=1;
+
                         }
 
                         for (int i = 0; i < itemCardsList.size(); i++) {
@@ -1790,6 +2301,13 @@ public class Item extends AppCompatActivity {
         LinearLayout exit =  dialogSearch.findViewById(R.id.exitsearch);
         final EditText itemCodeSearch = (EditText) dialogSearch.findViewById(R.id.itemCodeSearch);
         final ListView tabeSearch = (ListView) dialogSearch.findViewById(R.id.tableSearch);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                itemCodeSearch.requestFocus();
+            }
+        });
+
 
         itemCodeCard = new ArrayList<>();
 
@@ -1806,7 +2324,17 @@ public class Item extends AppCompatActivity {
         }
 
 
+        Button barcode;
+        barcode = dialogSearch.findViewById(R.id.barcode);
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                openBarCodeRedar = true;
+                openSearch = false;
+                readBarCode(itemCodeSearch,4);
+            }
+        });
 
 
         itemCodeSearch.addTextChangedListener(new TextWatcher() {
@@ -1860,6 +2388,9 @@ public class Item extends AppCompatActivity {
                         break;
                     case 4:
                         openPrice = true;
+                        break;
+                    case 5:
+                        openAssesst = true;
                         break;
                 }
 
@@ -1916,6 +2447,171 @@ public class Item extends AppCompatActivity {
         dialogSearch.show();
 
     }
+
+
+    void SearchDialogForAssets(final EditText itemCodeText, final int swSearch) {
+        final Dialog dialogSearch = new Dialog(Item.this,R.style.Theme_Dialog);
+        dialogSearch.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialogSearch.setCancelable(false);
+        if(controll.isYellow){
+            dialogSearch.setContentView(R.layout.search_dialog_yellow);
+        }else{
+            dialogSearch.setContentView(R.layout.search_dialog);
+        }
+
+
+        dialogSearch.setCanceledOnTouchOutside(false);
+
+        LinearLayout exit =  dialogSearch.findViewById(R.id.exitsearch);
+        final EditText itemCodeSearch = (EditText) dialogSearch.findViewById(R.id.itemCodeSearch);
+        final ListView tabeSearch = (ListView) dialogSearch.findViewById(R.id.tableSearch);
+
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                itemCodeSearch.requestFocus();
+            }
+        });
+
+        itemAssetsCa = new ArrayList<>();
+
+        itemAssetsCa = InventDB.getAllAssesstItem();
+
+        ListAdapterSearchAssets listAdapterSearch=new ListAdapterSearchAssets(Item.this,itemAssetsCa);
+        tabeSearch.setAdapter(listAdapterSearch);
+        final ArrayList<AssestItem> ItemCodeCardSearch=new ArrayList<>();
+        for (int i = 0; i < itemAssetsCa.size(); i++) {
+//            insertRowSearch(itemCodeCard.get(i).getItemName(), itemCodeCard.get(i).getItemCode(), tabeSearch, dialogSearch, itemCodeText, swSearch);
+            AssestItem itemCard= itemAssetsCa.get(i);
+            ItemCodeCardSearch.add(itemCard);
+
+        }
+
+
+        Button barcode;
+        barcode = dialogSearch.findViewById(R.id.barcode);
+        barcode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                openBarCodeRedar = true;
+                openSearch = false;
+                readBarCode(itemCodeSearch,4);
+            }
+        });
+
+
+        itemCodeSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String itemCodeReader = itemCodeSearch.getText().toString();
+                ItemCodeCardSearch.clear();
+                if (!itemCodeReader.equals("")) {
+                    if (openSearch) {
+                        for (int i = 0; i < itemAssetsCa.size(); i++) {
+                            if (itemAssetsCa.get(i).getAssesstCode().contains(itemCodeReader) || itemAssetsCa.get(i).getAssesstName().contains(itemCodeReader)) {
+//                            insertRowSearch(finalItemCodeCard.get(i).getItemName(), finalItemCodeCard.get(i).getItemCode(), tabeSearch, dialogSearch, itemCodeText, swSearch);
+                                AssestItem itemCard= itemAssetsCa.get(i);
+                                ItemCodeCardSearch.add(itemCard);
+                            }
+                        }
+                        ListAdapterSearchAssets listAdapterSearch=new ListAdapterSearchAssets(Item.this,ItemCodeCardSearch);
+                        tabeSearch.setAdapter(listAdapterSearch);
+                    }
+                }else{
+                    ListAdapterSearchAssets listAdapterSearch=new ListAdapterSearchAssets(Item.this,ItemCodeCardSearch);
+                    tabeSearch.setAdapter(listAdapterSearch);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        tabeSearch.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                openSearch = false;
+                switch (swSearch) {
+                    case 3:
+                        openSave = true;
+                        break;
+                    case 2:
+                        openShelfTag = true;
+                        break;
+                    case 1:
+                        openBarcode = true;
+                        break;
+                    case 4:
+                        openPrice = true;
+                        break;
+                    case 5:
+                        openAssesst = true;
+                        break;
+                }
+
+//                Log.e("rowid,", "...." + "" + v.getId() + "----->" + text.getText().toString());
+
+                itemCodeText.setText(ItemCodeCardSearch.get(position).getAssesstCode());
+                textId = 0;
+                dialogSearch.dismiss();
+
+            }
+        });
+
+        tabeSearch.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+//                Log.v(TAG, "CHILD TOUCH");
+
+                // Disallow the touch request for parent scroll on touch of  child view
+                v.getParent().requestDisallowInterceptTouchEvent(true);
+                return false;
+            }
+        });
+
+
+
+        exit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialogSearch.dismiss();
+                openSearch = false;
+                switch (swSearch) {
+                    case 1:
+                        openBarcode = true;
+                        break;
+                    case 2:
+                        openShelfTag = true;
+                        break;
+                    case 3:
+                        openSave = true;
+                        break;
+                    case 4:
+                        openPrice = true;
+                        break;
+
+                }
+                itemCodeText.requestFocus();
+                itemCodeText.setText("");
+                textId = 0;
+            }
+        });
+
+
+        dialogSearch.show();
+
+    }
+
 
     void insertRowSearch(String itemName, String itemCode, TableLayout recipeTable, final Dialog dialogFinsh, final EditText itemCodeText, final int swSearch) {
 
@@ -2021,46 +2717,46 @@ public class Item extends AppCompatActivity {
 
 
 
-    public void openFolder(){
-        Intent chooser = new Intent(Intent.ACTION_GET_CONTENT);
-        Uri uri = Uri.parse(Environment.getDownloadCacheDirectory().getPath().toString());
-        chooser.addCategory(Intent.CATEGORY_OPENABLE);
-        chooser.setDataAndType(uri, "*/*");
-// startActivity(chooser);
-        try {
-            startActivityForResult(chooser, READ_REQUEST_CODE);
-        }
-        catch (android.content.ActivityNotFoundException ex)
-        {
-            Toast.makeText(this, getResources().getString(R.string.insertData),
-                    Toast.LENGTH_SHORT).show();
-
-
-        }
-
-    }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode,
-                                 Intent resultData) {
-
-        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
-        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
-        // response to some other intent, and the code below shouldn't run at all.
-
-        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-
-            Uri uri = null;
-            if (resultData != null) {
-                uri = resultData.getData();
-                Log.i("123*", "Uri: " + uri.toString());
-
-                pathNameFr.setText( uri.toString());
-
-            }
-        }
-    }
+//    public void openFolder(){
+//        Intent chooser = new Intent(Intent.ACTION_GET_CONTENT);
+//        Uri uri = Uri.parse(Environment.getDownloadCacheDirectory().getPath().toString());
+//        chooser.addCategory(Intent.CATEGORY_OPENABLE);
+//        chooser.setDataAndType(uri, "*/*");
+//// startActivity(chooser);
+//        try {
+//            startActivityForResult(chooser, READ_REQUEST_CODE);
+//        }
+//        catch (android.content.ActivityNotFoundException ex)
+//        {
+//            Toast.makeText(this, getResources().getString(R.string.insertData),
+//                    Toast.LENGTH_SHORT).show();
+//
+//
+//        }
+//
+//    }
+//
+//
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode,
+//                                 Intent resultData) {
+//
+//        // The ACTION_OPEN_DOCUMENT intent was sent with the request code
+//        // READ_REQUEST_CODE. If the request code seen here doesn't match, it's the
+//        // response to some other intent, and the code below shouldn't run at all.
+//
+//        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+//
+//            Uri uri = null;
+//            if (resultData != null) {
+//                uri = resultData.getData();
+//                Log.i("123*", "Uri: " + uri.toString());
+//
+//                pathNameFr.setText( uri.toString());
+//
+//            }
+//        }
+//    }
 
 
     public void Clickable() {
@@ -2070,7 +2766,7 @@ public class Item extends AppCompatActivity {
         pBarcode.setClickable(true);
         pShelfTag.setClickable(true);
         ItemPrice.setClickable(true);
-
+        Assesst.setClickable(true);
 
     }
     void TimeDialog(final TextView itemExpDate) {
@@ -2209,6 +2905,83 @@ public class Item extends AppCompatActivity {
         return itemOCode;
     }
 
+    public List<ItemQR> findQRCode(String ItemQR,String strNo) {
+
+        List<ItemQR> itemOCode = InventDB.getAllQRItem(ItemQR,strNo);
+
+        return itemOCode;
+    }
+
+    public void readBarCode(TextView itemCodeText, int swBarcode) {
+
+        barCodTextTemp = itemCodeText;
+        Log.e("barcode_099", "in");
+        IntentIntegrator intentIntegrator = new IntentIntegrator(Item.this);
+        intentIntegrator.setDesiredBarcodeFormats(intentIntegrator.ALL_CODE_TYPES);
+        intentIntegrator.setBeepEnabled(false);
+        intentIntegrator.setCameraId(0);
+        intentIntegrator.setPrompt("SCAN");
+        intentIntegrator.setBarcodeImageEnabled(false);
+        intentIntegrator.initiateScan();
+
+        openBarCodeRedar = false;
+        switch (swBarcode) {
+            case 0:
+                openShelfTag = true;
+                break;
+            case 1:
+                openBarcode = true;
+                break;
+            case 2:
+                openPrice = true;
+                break;
+            case 3:
+                openSave = true;
+                break;
+            case 4:
+                openSearch = true;
+                break;
+
+            case 5:
+                openAssesst = true;
+                break;
+
+//            case 6:
+//                collTransfer = true;
+//                break;
+        }
+
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        IntentResult Result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (Result != null) {
+            if (Result.getContents() == null) {
+                Log.d("MainActivity", "cancelled scan");
+//                Toast.makeText(this, "cancelled", Toast.LENGTH_SHORT).show();
+                TostMesage(getResources().getString(R.string.cancel));
+            } else {
+                Log.d("MainActivity", "Scanned");
+//                Toast.makeText(this, getString(R.string.scan) + Result.getContents(), Toast.LENGTH_SHORT).show();
+//                TostMesage(getResources().getString(R.string.scan)+Result.getContents());
+                barCodTextTemp.setText(Result.getContents() + "");
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    public  List<String> findUnite(String Item){
+
+        List<String> itemOCode= InventDB.getItemUnite(Item);
+
+        return itemOCode;
+    }
+
 
     void initialization() {
         Home=(TextView) findViewById(R.id.home);
@@ -2217,6 +2990,7 @@ public class Item extends AppCompatActivity {
         pBarcode = (LinearLayout) findViewById(R.id.barcode);
         pShelfTag = (LinearLayout) findViewById(R.id.shelf);
         ItemPrice= (LinearLayout) findViewById(R.id.ItemPrice);
+        Assesst= (LinearLayout) findViewById(R.id.Assesst);
 
         importText.setVisibility(View.GONE);
         newItem.setOnClickListener(showDialogOnClick);
@@ -2224,7 +2998,7 @@ public class Item extends AppCompatActivity {
         pBarcode.setOnClickListener(showDialogOnClick);
         pShelfTag.setOnClickListener(showDialogOnClick);
         ItemPrice.setOnClickListener(showDialogOnClick);
-
+        Assesst.setOnClickListener(showDialogOnClick);
         Clickable();
 
     }

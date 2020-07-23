@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\Rawan_Riyad\\StudioProjects\\designvalae\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-id\\values-id.xml",
+            "outputFile": "C:\\Users\\user54\\AndroidStudioProjects\\SalesmanManagerNew\\designvalae\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-id\\values-id.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\Rawan_Riyad\\.gradle\\caches\\transforms-2\\files-2.1\\a541f6672ee35b71074028cf8ee8924b\\res\\values-id\\values-id.xml",
+                    "source": "C:\\Users\\user54\\.gradle\\caches\\transforms-2\\files-2.1\\b5e7132ba46628204e0166ff9f7da3fa\\res\\values-id\\values-id.xml",
                     "from": {
                         "startLines": "2,3,4,5",
                         "startColumns": "4,4,4,4",

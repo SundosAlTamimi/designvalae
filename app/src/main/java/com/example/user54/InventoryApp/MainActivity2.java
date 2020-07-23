@@ -5,7 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.OvershootInterpolator;
@@ -21,10 +23,18 @@ import com.example.user54.InventoryApp.Model.MainSetting;
 import com.example.user54.InventoryApp.Model.Password;
 import com.example.user54.InventoryApp.R;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
-
+//WORK
 public class MainActivity2 extends AppCompatActivity {
 //    Button exit, collecting, item, setting, report,send;
     LinearLayout  collecting, item, report,send;
@@ -213,6 +223,7 @@ public class MainActivity2 extends AppCompatActivity {
                 case R.id.setting:
                     Intent tools = new Intent(MainActivity2.this, Tools.class);
                     startActivity(tools);
+
                     break;
                 case R.id.send:
 //                    Intent coll = new Intent(MainActivity.this, CllectingData.class);
@@ -223,7 +234,7 @@ public class MainActivity2 extends AppCompatActivity {
                     List<MainSetting> mainSetting=InventoryDb.getAllMainSetting();
                     if(mainSetting.size()!=0) {
 
-                        alertMessageDialog(getResources().getString(R.string.importData), getResources().getString(R.string.importDataMessage), 2, "", "");
+                        alertMessageDialog(getResources().getString(R.string.importData), getResources().getString(R.string.importDataMessage), 2, "", mainSetting.get(0).getIsAssest());
                     }else{
 
                         new SweetAlertDialog(MainActivity2.this, SweetAlertDialog.WARNING_TYPE)
@@ -239,7 +250,10 @@ public class MainActivity2 extends AppCompatActivity {
                     break;
                 case R.id.exit:
                     alertMessageDialog(getResources().getString(R.string.exitfromapp), getResources().getString(R.string.exitMessage), 0, "", "");
-                    break;
+
+///data/data/com.example.user54.InventoryApp/databases
+//                    /data/data/com.example.user54.InventoryApp/databases/InventoryDBase
+
             }
 
 
@@ -251,9 +265,16 @@ public class MainActivity2 extends AppCompatActivity {
         final Button itemCard = new Button(this);
         final Button itemSwitch = new Button(this);
         final Button itemStore = new Button(this);
+        final Button itemUnite = new Button(this);
+        final Button itemAssets = new Button(this);
+        final Button itemQr = new Button(this);
+
         itemCard.setText(getResources().getString(R.string.Import_Item_Card));
         itemSwitch.setText(getResources().getString(R.string.ImportItemSwitch));
         itemStore.setText(getResources().getString(R.string.ImporItemStore));
+        itemUnite.setText("Import Item Unite");
+        itemAssets.setText("Import Item Assets");
+        itemQr.setText("Import Item QR");
         if (SweetAlertDialog.DARK_STYLE) {
             itemCard.setTextColor(Color.WHITE);
             itemSwitch.setTextColor(Color.WHITE);
@@ -268,7 +289,11 @@ public class MainActivity2 extends AppCompatActivity {
         linearLayout.setOrientation(LinearLayout.VERTICAL);
         linearLayout.addView(itemCard);
         linearLayout.addView(itemSwitch);
+        linearLayout.addView(itemQr);
+        linearLayout.addView(itemUnite);
         linearLayout.addView(itemStore);
+        linearLayout.addView(itemAssets);
+
 
         final SweetAlertDialog dialog = new SweetAlertDialog(this, SweetAlertDialog.CUSTOM_IMAGE_TYPE)
                 .setTitleText(getResources().getString(R.string.importData))
@@ -305,6 +330,33 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
 
+        itemUnite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                messages(5);
+                dialog.dismissWithAnimation();
+
+
+            }
+        });
+
+        itemAssets.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                messages(6);
+                dialog.dismissWithAnimation();
+            }
+        });
+
+
+        itemQr.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                messages(7);
+                dialog.dismissWithAnimation();
+            }
+        });
+
 
 
     }
@@ -312,7 +364,6 @@ public class MainActivity2 extends AppCompatActivity {
     void messages(int y){
         List<MainSetting> mainSetting=InventoryDb.getAllMainSetting();
         if(mainSetting.size()!=0) {
-
             alertMessageDialog(getResources().getString(R.string.importData), getResources().getString(R.string.importDataMessage), y, "", "");
         }else{
 
@@ -323,8 +374,6 @@ public class MainActivity2 extends AppCompatActivity {
                     .showCancelButton(false)
                     .setCancelClickListener(null)
                     .setConfirmClickListener(null).show();
-
-
         }
     }
 
@@ -429,6 +478,43 @@ public class MainActivity2 extends AppCompatActivity {
 
                                 break;
 
+
+
+                            case 5:
+
+                                sDialog.setTitleText(getResources().getString(R.string.cancel) + "!")
+                                        .setContentText(getResources().getString(R.string.cancelImport))
+                                        .setConfirmText(getResources().getString(R.string.ok))
+                                        .showCancelButton(false)
+                                        .setCancelClickListener(null)
+                                        .setConfirmClickListener(null)
+                                        .changeAlertType(SweetAlertDialog.ERROR_TYPE);
+
+                                break;
+                            case 6:
+
+                                sDialog.setTitleText(getResources().getString(R.string.cancel) + "!")
+                                        .setContentText(getResources().getString(R.string.cancelImport))
+                                        .setConfirmText(getResources().getString(R.string.ok))
+                                        .showCancelButton(false)
+                                        .setCancelClickListener(null)
+                                        .setConfirmClickListener(null)
+                                        .changeAlertType(SweetAlertDialog.ERROR_TYPE);
+
+                                break;
+
+                            case 7:
+
+                                sDialog.setTitleText(getResources().getString(R.string.cancel) + "!")
+                                        .setContentText(getResources().getString(R.string.cancelImport))
+                                        .setConfirmText(getResources().getString(R.string.ok))
+                                        .showCancelButton(false)
+                                        .setCancelClickListener(null)
+                                        .setConfirmClickListener(null)
+                                        .changeAlertType(SweetAlertDialog.ERROR_TYPE);
+
+                                break;
+
                         }
 
 
@@ -452,8 +538,15 @@ public class MainActivity2 extends AppCompatActivity {
                                 break;
                             case 2:
                                 importJson sendCloud = new importJson(MainActivity2.this,"",1);
-                                sendCloud.startSending("ItemCard");
 
+                                if(ItemCode.equals("1")) {
+                                    sendCloud.startSending("GetAssest");
+                                    Log.e("GetAssest","GetAssest get from server");
+                                }else{
+                                    sendCloud.startSending("ItemCard");
+
+                                    Log.e("GetAssest","GetAssest not get  from server");
+                                }
 //                                importJson sendCloud2 = new importJson(MainActivity2.this,"");
 //                                sendCloud2.startSending("ItemSwitch");
 
@@ -484,6 +577,32 @@ public class MainActivity2 extends AppCompatActivity {
                                 sDialog.dismissWithAnimation();
                                 break;
 
+                            case 5:
+                                importJson sendCloud5 = new importJson(MainActivity2.this,"",1);
+                                sendCloud5.startSending("itemUnite");
+
+//                                importJson sendCloud2 = new importJson(MainActivity2.this,"");
+//                                sendCloud2.startSending("ItemSwitch");
+
+//                                importJson sendCloud3 = new importJson(MainActivity2.this,"");
+//                                sendCloud3.startSending("GetStory");
+                                sDialog.dismissWithAnimation();
+                                break;
+
+                            case 6:
+                                importJson sendCloud6 = new importJson(MainActivity2.this,"",1);
+                                sendCloud6.startSending("GetAssest");
+
+                                sDialog.dismissWithAnimation();
+                                break;
+
+                            case 7:
+                                importJson sendCloud7 = new importJson(MainActivity2.this,"",1);
+                                sendCloud7.startSending("SyncItemQR");
+
+                                sDialog.dismissWithAnimation();
+                                break;
+
                         }
 
 
@@ -500,5 +619,7 @@ public class MainActivity2 extends AppCompatActivity {
 
 
     }
+
+
 
 }

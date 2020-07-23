@@ -115,6 +115,23 @@
 
             </TableRow>
 
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bac_frame_no"
+                android:padding="5dp">
+
+
+                <CheckBox
+                    android:id="@+id/AssestCheckBox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Is Assest"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textStyle="bold" />
+            </TableRow>
+
         </TableLayout>
 
         <LinearLayout
