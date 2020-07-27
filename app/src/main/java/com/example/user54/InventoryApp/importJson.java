@@ -592,7 +592,7 @@ public class importJson {
                     maxInDate=date[2]+"/"+date[1]+"/"+date[0];
                     Log.e("splitSwitch ",""+maxInDate);
                 }
-//                String data = "MAXDATE=" + URLEncoder.encode(maxInDate, "UTF-8");
+                String data = "MAXDATE=" + URLEncoder.encode(maxInDate, "UTF-8");
 ////
                 URL url = new URL(link);
 
@@ -602,11 +602,11 @@ public class importJson {
                 httpURLConnection.setDoInput(true);
                 httpURLConnection.setRequestMethod("POST");
 
-//                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
-//                wr.writeBytes(data);
-//                wr.flush();
-//                wr.close();
-//                Log.e("url____",""+link+data);
+                DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
+                wr.writeBytes(data);
+                wr.flush();
+                wr.close();
+                Log.e("url____",""+link+data);
 
                 InputStream inputStream = httpURLConnection.getInputStream();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
